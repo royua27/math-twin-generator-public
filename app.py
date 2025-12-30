@@ -3,7 +3,8 @@
 # -------------------------------------------------------------------------
 
 import streamlit as st
-import google.generativeai as genai
+# [Fix] Removed unused import that causes ModuleNotFoundError
+# import google.generativeai as genai 
 from PIL import Image
 import fitz  # PyMuPDF
 from fpdf import FPDF
