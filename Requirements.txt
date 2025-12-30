@@ -1,0 +1,9 @@
+streamlit
+google-generativeai
+pymupdf
+fpdf2
+pillow
+requests
+urllib3
+matplotlib
+numpy
