@@ -1009,9 +1009,17 @@ def apply_custom_css():
 
         /* Sidebar Text Fixes */
         [data-testid="stSidebar"] label {{
-            color: #e0e0e0 !important;
+            color: {primary} !important;
         }}
         [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {{
+            color: {primary} !important;
+        }}
+        
+        /* Custom Colors for Specific Texts */
+        [data-testid="stSidebar"] p {{
+            color: {primary} !important;
+        }}
+        [data-testid="stMarkdownContainer"] p {{
             color: {primary} !important;
         }}
 
@@ -1034,6 +1042,26 @@ def apply_custom_css():
         .status-item:last-child {{ border-bottom: none; }}
         .status-label {{ color: #e0e0e0; }} /* Brighter text for visibility */
         .status-value {{ color: {primary}; font-weight: bold; letter-spacing: 0.5px; }}
+
+        /* File Uploader Button Styling */
+        [data-testid="stFileUploader"] button {{
+            background-color: transparent !important;
+            color: {primary} !important;
+            border: 1px solid {primary} !important;
+            border-radius: 8px !important;
+            padding: 10px 20px !important;
+            font-weight: 600 !important;
+            transition: all 0.2s ease !important;
+        }}
+        [data-testid="stFileUploader"] button:hover {{
+            background-color: {primary} !important;
+            color: #242329 !important;
+            box-shadow: 0 0 10px {primary}44 !important;
+            transform: translateY(-1px) !important;
+        }}
+        [data-testid="stFileUploader"] div[data-testid="stMarkdownContainer"] p {{
+            color: {primary} !important;
+        }}
         </style>
     """, unsafe_allow_html=True)
 
@@ -1086,27 +1114,28 @@ def main_app_interface():
     c1, c2 = st.columns([1, 1.2])
     with c1:
         with st.container():
-            st.markdown('<div class="result-card"><div class="result-header">📸 Original</div><div class="result-body">', unsafe_allow_html=True)
-            q_file = st.file_uploader("Upload", type=['png','jpg','jpeg','pdf'], key="uploader")
-            if q_file:
-                img = pdf_to_image(q_file) if q_file.type == 'application/pdf' else Image.open(q_file)
-                st.image(img, use_container_width=True)
-                
-                if st.button("✨ Generate", type="primary", disabled=not api_key, use_container_width=True):
-                    with st.status("Generating..."):
-                        d_res, _ = generate_draft(api_key, img, st.session_state['difficulty'], st.session_state['grade'], st.session_state['curriculum_text'], "", st.session_state['style_img'], st.session_state['creativity'], st.session_state['prob_type'], st.session_state['subject'])
-                        f_res, _ = refine_final(api_key, d_res, st.session_state['style_img'], st.session_state['grade'], st.session_state['subject'])
+            st.markdown('<div class="result-card"><div class="result-header">📸 Original</div>', unsafe_allow_html=True)
+            with st.container(border=True):
+                q_file = st.file_uploader("Upload", type=['png','jpg','jpeg','pdf'], key="uploader")
+                if q_file:
+                    img = pdf_to_image(q_file) if q_file.type == 'application/pdf' else Image.open(q_file)
+                    st.image(img, use_container_width=True)
                     
-                        st.session_state['generated_data'] = parse_gemini_json_response(f_res)
+                    if st.button("✨ Generate", type="primary", disabled=not api_key, use_container_width=True):
+                        with st.status("Generating..."):
+                            d_res, _ = generate_draft(api_key, img, st.session_state['difficulty'], st.session_state['grade'], st.session_state['curriculum_text'], "", st.session_state['style_img'], st.session_state['creativity'], st.session_state['prob_type'], st.session_state['subject'])
+                            f_res, _ = refine_final(api_key, d_res, st.session_state['style_img'], st.session_state['grade'], st.session_state['subject'])
                         
-                        # Save to History
-                        if st.session_state['generated_data'].get('problem'):
-                             history_item = {"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "data": st.session_state['generated_data'], "grade": st.session_state['grade'], "difficulty": st.session_state['difficulty']}
-                             st.session_state['history'].insert(0, history_item)
-                             
-                        st.rerun()
-                if not api_key: st.error("API Key Required")
-            st.markdown('</div></div>', unsafe_allow_html=True)
+                            st.session_state['generated_data'] = parse_gemini_json_response(f_res)
+                            
+                            # Save to History
+                            if st.session_state['generated_data'].get('problem'):
+                                 history_item = {"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "data": st.session_state['generated_data'], "grade": st.session_state['grade'], "difficulty": st.session_state['difficulty']}
+                                 st.session_state['history'].insert(0, history_item)
+                                 
+                            st.rerun()
+                    if not api_key: st.error("API Key Required")
+            st.markdown('</div>', unsafe_allow_html=True)
 
     with c2:
         tab_curr, tab_hist = st.tabs(["✨ Result", "📜 History"])
