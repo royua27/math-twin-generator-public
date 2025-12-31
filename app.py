@@ -115,13 +115,13 @@ def display_sidebar_ads():
     # [Design Fix] Reduced spacing for sidebar elements via markdown CSS injection
     st.sidebar.markdown("""
         <style>
-        /* Reduce spacing in sidebar */
+        /* Reduce spacing in sidebar - Adjusted from -15px to -5px */
         [data-testid="stSidebar"] .stMarkdown, [data-testid="stSidebar"] .stButton {
-            margin-bottom: -15px !important;
+            margin-bottom: -5px !important;
         }
         [data-testid="stSidebar"] hr {
-            margin-top: 10px !important;
-            margin-bottom: 10px !important;
+            margin-top: 15px !important;
+            margin-bottom: 15px !important;
         }
         </style>
     """, unsafe_allow_html=True)
@@ -129,7 +129,7 @@ def display_sidebar_ads():
     st.sidebar.markdown("---")
     st.sidebar.header("📚 추천 학습 자료")
     
-    # [광고 1] 쿠팡/YES24 파트너스 링크 (밝은 배경으로 원상복구)
+    # [광고 1] 쿠팡/YES24 파트너스 링크 (밝은 배경)
     ad_html = """
     <div style="text-align: center; margin-bottom: 15px; background-color: #2F2E35; padding: 10px; border-radius: 10px; border: 1px solid #403e41;">
         <p style="color: #e4c1b2; font-size: 0.9em; margin-bottom: 5px;">🔥 선생님 필수템</p>
