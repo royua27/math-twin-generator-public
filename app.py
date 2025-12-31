@@ -129,7 +129,7 @@ def display_sidebar_ads():
     st.sidebar.markdown("---")
     st.sidebar.header("📚 추천 학습 자료")
     
-    # [광고 1] 쿠팡/YES24 파트너스 링크 예시
+    # [광고 1] 쿠팡/YES24 파트너스 링크 (밝은 배경으로 원상복구)
     ad_html = """
     <div style="text-align: center; margin-bottom: 15px; background-color: #2F2E35; padding: 10px; border-radius: 10px; border: 1px solid #403e41;">
         <p style="color: #e4c1b2; font-size: 0.9em; margin-bottom: 5px;">🔥 선생님 필수템</p>
@@ -143,7 +143,7 @@ def display_sidebar_ads():
     """
     st.sidebar.markdown(ad_html, unsafe_allow_html=True)
     
-    # [광고 2] 팁 영역 (st.info 대신 커스텀 디자인 적용하여 색상 문제 해결)
+    # [광고 2] 팁 영역
     tip_html = """
     <div style="margin-top: 10px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 8px; border-left: 3px solid #e4c1b2;">
         <div style="color: #e4c1b2; font-weight: bold; font-size: 0.9em; margin-bottom: 5px;">💡 Tip</div>
