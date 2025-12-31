@@ -112,6 +112,20 @@ for k, v in default_session.items():
 
 def display_sidebar_ads():
     """사이드바 광고 배너 영역"""
+    # [Design Fix] Reduced spacing for sidebar elements via markdown CSS injection
+    st.sidebar.markdown("""
+        <style>
+        /* Reduce spacing in sidebar */
+        [data-testid="stSidebar"] .stMarkdown, [data-testid="stSidebar"] .stButton {
+            margin-bottom: -15px !important;
+        }
+        [data-testid="stSidebar"] hr {
+            margin-top: 10px !important;
+            margin-bottom: 10px !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
     st.sidebar.markdown("---")
     st.sidebar.header("📚 추천 학습 자료")
     
