@@ -6,8 +6,6 @@ import streamlit as st
 # [Fix] Removed unused import that causes ModuleNotFoundError
 # import google.generativeai as genai 
 from PIL import Image
-import fitz  # PyMuPDF
-from fpdf import FPDF
 import io
 import os
 import json
@@ -22,6 +20,16 @@ import matplotlib
 import tempfile
 import zipfile
 import csv
+
+# [Fix] Import PyMuPDF safely with error handling
+try:
+    import fitz  # PyMuPDF
+except ImportError:
+    st.error("⚠️ 시스템 오류: `PyMuPDF` 라이브러리가 설치되지 않았습니다.")
+    st.info("💡 **해결 방법:** GitHub 저장소의 `app.py`와 **같은 위치**에 `requirements.txt` 파일이 있는지 확인해주세요.")
+    st.stop()
+
+from fpdf import FPDF
 
 # [Fix] Matplotlib GUI backend conflict prevention
 matplotlib.use('Agg') 
@@ -736,7 +744,7 @@ def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, st
         s_buf = io.BytesIO(); style_img.save(s_buf, format="JPEG"); s_str = base64.b64encode(s_buf.getvalue()).decode("utf-8")
         parts.append({"text": "Style Reference:"}); parts.append({"inline_data": {"mime_type": "image/jpeg", "data": s_str}})
 
-    payload = {"contents": [{"parts": parts}], "safetySettings": [{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}], "generationConfig": {"temperature": temperature}}
+    payload = {"contents": [{"parts": parts}], "safetySettings": [{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}], "generationConfig": {"temperature": 0.1, "response_mime_type": "application/json"}}
     return GeminiClient.call_api(api_key, payload)
 
 def refine_final(api_key, draft, style_img, grade, subject=None):
@@ -956,6 +964,43 @@ def apply_custom_css():
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 10px;
         }}
+
+        /* Sidebar Buttons */
+        [data-testid="stSidebar"] div.stButton > button {{
+            background-color: transparent;
+            color: {primary};
+            border: 1px solid {primary};
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }}
+        [data-testid="stSidebar"] div.stButton > button:hover {{
+            background-color: {primary};
+            color: #242329; /* Dark text on bright hover */
+            box-shadow: 0 0 10px {primary}44;
+            transform: translateY(-1px);
+        }}
+
+        /* Dashboard (Status Box) Visibility Fix */
+        .status-box {{
+            background-color: rgba(255,255,255,0.08); /* Lighter background */
+            border-left: 3px solid {primary};
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
+        }}
+        .status-item {{
+            display: flex; justify-content: space-between; 
+            margin-bottom: 8px;
+            border-bottom: 1px dashed rgba(255,255,255,0.1);
+            padding-bottom: 4px;
+        }}
+        .status-item:last-child {{ border-bottom: none; }}
+        .status-label {{ color: #e0e0e0; }} /* Brighter text for visibility */
+        .status-value {{ color: {primary}; font-weight: bold; letter-spacing: 0.5px; }}
         </style>
     """, unsafe_allow_html=True)
 
