@@ -121,14 +121,25 @@ def display_sidebar_ads():
         <p style="color: #e4c1b2; font-size: 0.9em; margin-bottom: 5px;">🔥 선생님 필수템</p>
         <a href="https://www.coupang.com/" target="_blank" style="text-decoration: none;">
             <div style="background-color: #eee; color: #333; padding: 15px; border-radius: 5px; font-weight: bold; font-size: 0.9em;">
-                쿠팡 수학 교구 모음전<br>
+                수학 교구 모음전<br>
                 <span style="font-size: 0.8em; color: #666;">(클릭하여 보기)</span>
             </div>
         </a>
     </div>
     """
     st.sidebar.markdown(ad_html, unsafe_allow_html=True)
-    st.sidebar.info("💡 **Tip:** 문제를 만드느라 힘드셨죠? [여기서 커피 한 잔 하세요!](https://www.starbucks.co.kr)")
+    
+    # [광고 2] 팁 영역 (st.info 대신 커스텀 디자인 적용하여 색상 문제 해결)
+    tip_html = """
+    <div style="margin-top: 10px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 8px; border-left: 3px solid #e4c1b2;">
+        <div style="color: #e4c1b2; font-weight: bold; font-size: 0.9em; margin-bottom: 5px;">💡 Tip</div>
+        <div style="color: #e0e0e0; font-size: 0.85em; line-height: 1.4;">
+            문제를 만드느라 힘드셨죠?<br>
+            <a href="https://www.starbucks.co.kr" target="_blank" style="color: #4CAF50; text-decoration: underline;">여기서 커피 한 잔 하세요!</a>
+        </div>
+    </div>
+    """
+    st.sidebar.markdown(tip_html, unsafe_allow_html=True)
 
 # =========================================================================
 # 3. Utilities & Logic (원본 기능 100% 복구)
@@ -550,7 +561,7 @@ class PDFGenerator:
                 sol_txt = f"[Answer] {data.get('answer', '')}\n\n[Solution]\n{data.get('solution', '')}".replace('\n', '\n\n')
                 chunk_img = PDFGenerator.render_text_to_image(sol_txt)
                 if chunk_img: PDFGenerator._add_image_to_pdf(pdf, chunk_img, w=175); pdf.ln(10)
-                else: pdf.multi_cell(0, 8, chunk_img.replace('$', '')); pdf.ln(10)
+                else: pdf.multi_cell(0, 8, chunk.replace('$', '')); pdf.ln(10)
 
         # 4. Quick Answers
         if export_mode == "Integrated":
@@ -980,6 +991,14 @@ def apply_custom_css():
             color: #242329; /* Dark text on bright hover */
             box-shadow: 0 0 10px {primary}44;
             transform: translateY(-1px);
+        }}
+
+        /* Sidebar Text Fixes */
+        [data-testid="stSidebar"] label {{
+            color: #e0e0e0 !important;
+        }}
+        [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {{
+            color: {primary} !important;
         }}
 
         /* Dashboard (Status Box) Visibility Fix */
