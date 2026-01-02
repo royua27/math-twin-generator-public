@@ -87,7 +87,7 @@ for k, v in default_session.items():
 UI_TEXT = {
     "Korean": {
         "guide_btn": "📖 가이드", "api_btn": "🔑 API 설정", "options_btn": "📝 옵션",
-        "materials_btn": "📚 자료함", "style_btn": "🖼️ 스타일", "theme_btn": "🎨 테마",
+        "materials_btn": "📚 자료함", "style_btn": "🖼️ 스타 noti", "theme_btn": "🎨 테마",
         "data_btn": "🗑️ 데이터", "sidebar_header": "📚 추천 학습 자료",
         "api_check_btn": "연결 확인", "api_success": "✅ API 키가 로드되었습니다", "api_error": "API 키가 필요합니다",
         "api_input_label": "🔑 API 키 입력", "original_card": "📸 원본 문제", "result_card": "✨ 생성 결과",
@@ -219,21 +219,21 @@ def display_sidebar_ads():
     st.sidebar.markdown(tip_html, unsafe_allow_html=True)
 def display_bottom_ad():
     current_grade = st.session_state.get('grade', '')
-    grade_map = {
-        "Elementary 3": "초등 3학년 수학 문제집",
-        "Elementary 4": "초등 4학년 수학 문제집",
-        "Elementary 5": "초등 5학년 수학 문제집",
-        "Elementary 6": "초등 6학년 수학 문제집",
-        "Middle 1": "중1 수학 문제집",
-        "Middle 2": "중2 수학 문제집",
-        "Middle 3": "중3 수학 문제집",
-        "High 1": "고1 수학 문제집",
-        "High 2": "고2 수학 문제집",
-        "High 3": "고3 수학 문제집",
-        "University Math": "대학수학 문제집"
+    # 학년별 고정 쿠팡 파트너스 링크 매핑 (사용자가 직접 입력할 수 있도록 아래 링크 수정)
+    partner_links = {
+        "Elementary 3": "https://www.coupang.com/여기에_초3_파트너스_링크_입력",
+        "Elementary 4": "https://www.coupang.com/여기에_초4_파트너스_링크_입력",
+        "Elementary 5": "https://www.coupang.com/여기에_초5_파트너스_링크_입력",
+        "Elementary 6": "https://www.coupang.com/여기에_초6_파트너스_링크_입력",
+        "Middle 1": "https://www.coupang.com/여기에_중1_파트너스_링크_입력",
+        "Middle 2": "https://www.coupang.com/여기에_중2_파트너스_링크_입력",
+        "Middle 3": "https://www.coupang.com/여기에_중3_파트너스_링크_입력",
+        "High 1": "https://www.coupang.com/여기에_고1_파트너스_링크_입력",
+        "High 2": "https://www.coupang.com/여기에_고2_파트너스_링크_입력",
+        "High 3": "https://www.coupang.com/여기에_고3_파트너스_링크_입력",
+        "University Math": "https://www.coupang.com/여기에_대학수학_파트너스_링크_입력"
     }
-    search_keyword = grade_map.get(current_grade, "수학 문제집")
-    partners_link = f"https://www.coupang.com/np/search?component=&q={search_keyword}&channel=user"
+    partners_link = partner_links.get(current_grade, "https://www.coupang.com/np/search?q=수학+문제집")
     ad_html = f"""
     <div style="
         position: fixed;
@@ -863,7 +863,7 @@ def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, st
         elif subject in ["Calculus", "Differential Geometry"]:
             drawing_constraint = "6. **그림 생성 필수 권장:** 이 분야(미적분/기하)는 시각적 이해가 중요하므로, matplotlib 코드를 적극적으로 생성하여 그래프나 도형을 제공하십시오."
     if temperature < 0.3:
-        mode_desc = "Change numbers/symbols only (Maintain Segment)"
+        mode_desc = "Change numbers/symbols only (Maintain Structure)"
     elif temperature < 0.7:
         mode_desc = "Change context but maintain core concept"
     else:
@@ -1309,7 +1309,7 @@ def main_app_interface():
                 pdf_bytes = PDFGenerator.create_single_pdf(data, title, fig_img, internal_mode)
                 if pdf_bytes:
                     st.download_button(T("download_pdf"), data=bytes(pdf_bytes), file_name=f"{title}.pdf", mime="application/pdf", use_container_width=True)
-                st.success("팁:, 이 문제가 마음에 드셨나요? 더 많은 자료는 아래 링크를 확인해보세요!")
+                st.success("팁: 이 문제가 마음에 드셨나요? 더 많은 자료는 아래 링크를 확인해보세요!")
                 st.markdown("""
                 <a href="https://www.yes24.com" target="_blank">
                     <div style="background-color: #f0f2f6; padding: 15px; border-radius: 8px; text-align: center; color: #333;">
