@@ -233,7 +233,7 @@ def display_bottom_ad():
         "High 3": "https://link.coupang.com/a/dkdSxf",
         "University Math": "https://link.coupang.com/a/dkdSxf"
     }
-    partners_link = partner_links.get(current_grade, "https://www.coupang.com/np/search?q=수학+문제집")
+    partners_link = partner_links.get(current_grade, "https://link.coupang.com/a/dkjUiJ")
     ad_html = f"""
     <div style="
         position: fixed;
@@ -1342,6 +1342,7 @@ def main():
     main_app_interface()
 if __name__ == "__main__":
     main()
+
 
 
 
