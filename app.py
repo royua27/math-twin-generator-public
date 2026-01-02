@@ -1,20 +1,7 @@
 import streamlit as st
-st.set_page_config(
-    page_title="수학 변형 문제 생성기 - 원본 문제 입력하면 변형 문제 제작",  # 브라우저 탭과 검색 결과 제목
-    page_icon="➗",  # 탭에 보이는 아이콘
-    layout="centered",
-    initial_sidebar_state="expanded",
-    menu_items={
-        'Get Help': 'https://github.com/royua',
-        'Report a bug': "https://github.com/royua",
-        'About': "# 수학 변형 문제 생성기\n수학 문제를 입력하면 유사한 문제를 무한으로 만들어줍니다."
-    }
-)
 
 # 메인 화면에도 텍스트가 있어야 봇이 읽어갑니다.
-st.title("수학 변형 문제 생성기 (Math Twin Generator)")
-st.markdown("### 문제를 입력하면 유사 문제를 만들어줍니다.")
-st.write("수학 내신 대비, 오답 노트, 변형 문제 제작을 위한 무료 도구입니다.") 
+st.write("수학 변형 문제 생성기 - 수학 내신 대비, 오답 노트, 변형 문제 제작을 위한 무료 도구입니다.") 
 # ↑ 이런 식으로 '키워드(수학, 내신, 변형 문제)'가 포함된 문장이 화면에 텍스트로 박혀 있어야 합니다.
 
 from PIL import Image
@@ -1360,6 +1347,7 @@ def main():
     main_app_interface()
 if __name__ == "__main__":
     main()
+
 
 
 
