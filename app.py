@@ -1,3 +1,4 @@
+```python
 import streamlit as st
 from PIL import Image
 import io
@@ -14,14 +15,12 @@ import matplotlib
 import tempfile
 import zipfile
 import csv
-
 try:
-    import fitz  # PyMuPDF
+    import fitz # PyMuPDF
 except ImportError:
     st.error("⚠️ 시스템 오류: `PyMuPDF` 라이브러리가 설치되지 않았습니다.")
     st.info("💡 **해결 방법:** GitHub 저장소의 `app.py`와 **같은 위치**에 `requirements.txt` 파일이 있는지 확인해주세요.")
     st.stop()
-
 from fpdf import FPDF
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -29,9 +28,7 @@ import matplotlib.font_manager as fm
 import numpy as np
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
-
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
 # =========================================================================
 # 1. Initialization & Configuration
 # =========================================================================
@@ -41,13 +38,11 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FONT_FILENAME = "NanumGothic.ttf"
 FONT_PATH = os.path.join(BASE_DIR, FONT_FILENAME)
 REF_DIR_NAME = "references"
 REF_DIR_PATH = os.path.join(BASE_DIR, REF_DIR_NAME)
-
 @st.cache_resource
 def setup_fonts():
     font_ready = False
@@ -75,9 +70,7 @@ def setup_fonts():
         plt.rcParams['font.family'] = 'sans-serif'
         plt.rcParams['axes.unicode_minus'] = False
     return font_ready
-
 setup_fonts()
-
 default_session = {
     'curriculum_text': "", 'base_ref_text': "", 'generated_data': None,
     'valid_model_name': None,
@@ -92,7 +85,6 @@ default_session = {
 for k, v in default_session.items():
     if k not in st.session_state:
         st.session_state[k] = v
-
 UI_TEXT = {
     "Korean": {
         "guide_btn": "📖 가이드", "api_btn": "🔑 API 설정", "options_btn": "📝 옵션",
@@ -169,10 +161,8 @@ UI_TEXT = {
         "export_mode_solution": "Solution Only"
     }
 }
-
 def T(key):
     return UI_TEXT[st.session_state['language']].get(key, key)
-
 def get_option_label(option):
     if st.session_state['language'] == 'Korean':
         K_MAP = {
@@ -187,7 +177,6 @@ def get_option_label(option):
         }
         return K_MAP.get(option, option)
     return option
-
 # =========================================================================
 # 2. Ad & Marketing Components
 # =========================================================================
@@ -226,7 +215,6 @@ def display_sidebar_ads():
     </div>
     """
     st.sidebar.markdown(tip_html, unsafe_allow_html=True)
-
 def display_bottom_ad():
     current_grade = st.session_state.get('grade', '')
     search_keyword = "수학문제집"
@@ -284,7 +272,6 @@ def display_bottom_ad():
     </div>
     """
     st.markdown(ad_html, unsafe_allow_html=True)
-
 # =========================================================================
 # 3. Utilities & Logic
 # =========================================================================
@@ -320,7 +307,6 @@ def load_reference_materials():
     except:
         pass
     return combined_text, file_count
-
 def check_files():
     if not os.path.exists(FONT_PATH):
         pass
@@ -330,7 +316,6 @@ def check_files():
             st.session_state['base_ref_text'] = text
             st.toast(f"📚 Loaded {count} reference files!", icon="🟣")
     return True
-
 def extract_text_safe(uploaded_file):
     text_content = ""
     try:
@@ -349,7 +334,6 @@ def extract_text_safe(uploaded_file):
         return text_content, None
     except Exception as e:
         return "", str(e)
-
 def pdf_to_image(uploaded_file):
     try:
         uploaded_file.seek(0)
@@ -365,7 +349,6 @@ def pdf_to_image(uploaded_file):
             return img
     except:
         return None
-
 def normalize_latex_text(text):
     if text is None:
         return ""
@@ -374,30 +357,26 @@ def normalize_latex_text(text):
     text = re.sub(r'\\begin\{cases\}', r'\{', text)
     text = re.sub(r'\\end\{cases\}', r'\}', text)
     text = text.replace('$$', '$')
-    text = text.replace('\\[', '$').replace('\\]', '$')
-    text = text.replace('\\(', '$').replace('\\)', '$')
+    text = text.replace('\$$ ', '\( ').replace('\ $$', ' \)')
+    text = text.replace('\$$ ', '\( ').replace('\ $$', ' \)')
     return text
-
 def clean_python_code(code):
     if not code:
         return ""
     code = re.sub(r'\\\s*\n', ' ', code)
     code = code.replace('plt.show()', '# plt.show() removed')
     return code
-
 def validate_python_code(code):
     dangerous = ['import os', 'import sys', 'import subprocess', 'open(', 'exec(', 'eval(', '__import__', 'globals', 'locals', 'urllib', 'requests', 'socket']
     for kw in dangerous:
         if kw in code:
             return False, f"Security Risk: {kw}"
     return True, "Safe"
-
 def split_long_latex(text, limit=75):
     if not text:
         return ""
     if not isinstance(text, str):
         text = str(text)
-
     def replacer(match):
         content = match.group(0)
         inner = content[1:-1].strip()
@@ -410,30 +389,28 @@ def split_long_latex(text, limit=75):
             new_inner = parts[0].strip()
             for part in parts[1:]:
                 new_inner += "\n\n=" + part.strip()
-            return f"${new_inner}$"
+            return f"$$ {new_inner} $$"
         elif "=" in inner:
             parts = inner.split("=")
             new_inner = parts[0].strip()
             for part in parts[1:]:
                 new_inner += "\n\n=" + part.strip()
-            return f"${new_inner}$"
+            return f"$$ {new_inner} $$"
         for op in [" + ", " - "]:
             if op in inner:
                 parts = inner.split(op)
                 new_inner = parts[0].strip()
                 for part in parts[1:]:
                     new_inner += "\n\n" + op.strip() + part.strip()
-                return f"${new_inner}$"
+                return f"$$ {new_inner} $$"
         return content
     processed = re.sub(r'\$.*?\$', replacer, text, flags=re.DOTALL)
-    processed = re.sub(r'\$\s+', '$', processed)
-    processed = re.sub(r'\s+\$', '$', processed)
+    processed = re.sub(r'\$$ \s+', ' $$', processed)
+    processed = re.sub(r'\s+\$$ ', ' $$', processed)
     return processed
-
 def get_base64_of_bin_file(bin_file):
     data = bin_file.read()
     return base64.b64encode(data).decode()
-
 def parse_gemini_json_response(text):
     try:
         match = re.search(r"\{.*\}", text, re.DOTALL)
@@ -448,7 +425,13 @@ def parse_gemini_json_response(text):
                 if isinstance(val, (list, tuple)):
                     val = "\n\n".join(map(str, val))
                 elif isinstance(val, dict):
-                    val = str(val)
+                    # 강화된 처리: problem이 dict 형태로 들어온 경우 'question_text'나 첫 번째 값 추출
+                    if key == "problem" and 'question_text' in val:
+                        val = val['question_text']
+                    elif key == "problem" and val:
+                        val = str(list(val.values())[0]) if isinstance(val, dict) else str(val)
+                    else:
+                        val = str(val)
                 elif val is None:
                     val = ""
                 else:
@@ -480,10 +463,14 @@ def parse_gemini_json_response(text):
                     extracted_data[k] = clean_python_code(content)
                 else:
                     extracted_data[k] = normalize_latex_text(content)
+        # 백업: problem이 비어있고 'question_text'가 있으면 강제 추출
+        if not extracted_data["problem"] and 'question_text' in text:
+            qmatch = re.search(r'"question_text"\s*:\s*"(.*?)"', text, re.DOTALL)
+            if qmatch:
+                extracted_data["problem"] = normalize_latex_text(qmatch.group(1))
         if len(extracted_data["problem"]) > 10:
             return extracted_data
         return {"problem": text, "concept": "Parsing Error", "achievement_standard": "", "hint": "", "answer": "", "solution": "", "drawing_code": ""}
-
 # =========================================================================
 # 4. PDF Generator
 # =========================================================================
@@ -539,7 +526,6 @@ class PDFGenerator:
                 return buf
         except:
             return None
-
     class ExamPDF(FPDF):
         def header(self):
             if os.path.exists(FONT_PATH):
@@ -551,7 +537,6 @@ class PDFGenerator:
             self.ln(5)
             self.line(10, 20, 200, 20)
             self.ln(10)
-
         def footer(self):
             self.set_y(-15)
             if os.path.exists(FONT_PATH):
@@ -559,7 +544,6 @@ class PDFGenerator:
             else:
                 self.set_font('helvetica', 'I', 8)
             self.cell(0, 10, f'Page {self.page_no()}', align='C')
-
     @staticmethod
     def _add_image_to_pdf(pdf_obj, image_data, x=None, w=0):
         if not image_data:
@@ -589,7 +573,6 @@ class PDFGenerator:
                     os.unlink(tmp_path)
                 except:
                     pass
-
     @staticmethod
     def _generate_figure_from_code(code):
         if not code or "plt" not in code:
@@ -608,7 +591,6 @@ class PDFGenerator:
             return buf
         except:
             return None
-
     @staticmethod
     def create_single_pdf(data, title, figure_image, export_mode="Integrated"):
         pdf = PDFGenerator.ExamPDF()
@@ -666,7 +648,6 @@ class PDFGenerator:
         if isinstance(out, str):
             return out.encode('latin-1')
         return bytes(out)
-
     @staticmethod
     def create_workbook_pdf(history_items, title="My Math Workbook", export_mode="Integrated"):
         pdf = PDFGenerator.ExamPDF()
@@ -754,7 +735,6 @@ class PDFGenerator:
                 pdf.cell(col_width, 10, text1, border=1)
                 pdf.cell(col_width, 10, text2, border=1, ln=True)
         return pdf.output(dest='S').encode('latin-1')
-
     @staticmethod
     def create_history_zip(history_items):
         zip_buffer = io.BytesIO()
@@ -773,7 +753,6 @@ class PDFGenerator:
                 except Exception as e:
                     print(f"Error zipping item {idx}: {e}")
         return zip_buffer.getvalue()
-
     @staticmethod
     def convert_history_to_csv(history):
         output = io.StringIO()
@@ -786,7 +765,6 @@ class PDFGenerator:
                 data.get('concept', ''), data.get('problem', ''), data.get('answer', ''), data.get('solution', '')
             ])
         return output.getvalue().encode('utf-8-sig')
-
 # =========================================================================
 # 5. API Client & Logic
 # =========================================================================
@@ -808,7 +786,6 @@ class GeminiClient:
         except:
             pass
         return priorities
-
     @staticmethod
     def test_api_connection(api_key):
         candidates = GeminiClient.get_working_model(api_key)
@@ -822,7 +799,6 @@ class GeminiClient:
             except:
                 pass
         return False, "No usable model found."
-
     @staticmethod
     def call_api(api_key, payload, active_model_name=None, retry=0):
         pref_mode = st.session_state.get('preferred_model_mode', 'Auto')
@@ -861,7 +837,6 @@ class GeminiClient:
                 time.sleep(5)
                 return GeminiClient.call_api(api_key, payload, active_model_name, retry+1)
             return f"Network Error: {str(e)}", m
-
 def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, style_img, temperature, p_type, subject=None, lang="Korean"):
     opt_img = image.copy()
     opt_img.thumbnail((800, 800))
@@ -907,12 +882,11 @@ def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, st
     elif p_type == "Essay":
         type_inst = "Make this a narrative/essay type question requiring logical explanation."
     if lang == "English":
-        lang_line = "1. **Language:** Provide the Problem, Solution, and Explanation in **English**."
+        lang_line = "1. **Language:** Provide the Problem, Solution, and Explanation in ** English**."
     else:
         lang_line = "1. **언어:** 문제, 풀이, 해설 등 모든 텍스트는 **반드시 한국어(Korean)**로 작성하십시오."
     parts = [{"text": f"""
     당신은 대한민국 수학 교육 전문가입니다. 입력된 이미지의 문제를 분석하여, 동일한 수학적 개념을 묻는 '{grade_kr}' 수준(난이도:{diff_kr})의 새로운 '쌍둥이 문제'를 만드십시오.
-
     [필수 지침]
     {lang_line}
     2. **용어 제한(중요):** 대한민국 초/중/고등학교 교육과정 내의 표준 용어만 사용하십시오.
@@ -936,7 +910,6 @@ def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, st
         parts.append({"inline_data": {"mime_type": "image/jpeg", "data": s_str}})
     payload = {"contents": [{"parts": parts}], "safetySettings": [{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}], "generationConfig": {"temperature": max(0.8, temperature), "response_mime_type": "application/json"}}
     return GeminiClient.call_api(api_key, payload)
-
 def refine_final(api_key, draft, style_img, grade, subject=None, lang="Korean"):
     grade_map = {
         "Elementary 3": "초등학교 3학년", "Elementary 4": "초등학교 4학년", "Elementary 5": "초등학교 5학년", "Elementary 6": "초등학교 6학년",
@@ -953,7 +926,7 @@ def refine_final(api_key, draft, style_img, grade, subject=None, lang="Korean"):
     if grade == "University Math" and subject:
         subject_kr = subject_map.get(subject, subject)
         grade_kr = f"대학수학({subject_kr})"
-        validation_prompt = f"""
+        validation_prompt = """
         [대학수학 정밀 검증]
         - 전공 분야: {subject_kr}
         - 생성된 문제가 해당 전공의 공리 및 정리와 모순되지 않는지 엄밀히 증명하십시오.
@@ -973,7 +946,6 @@ def refine_final(api_key, draft, style_img, grade, subject=None, lang="Korean"):
         lang_line = "1. **언어:** 모든 내용은 **한국어(Korean)**로 작성되어야 합니다."
     prompt = f"""
     당신은 대한민국 수학 문제 검토 위원장입니다. 아래 초안(Draft)을 면밀히 검토하고, 오류가 있다면 수정한 뒤 최종본을 JSON 포맷으로 작성하십시오.
-
     [검토 및 수정 지침]
     {lang_line}
     2. **풀이 검증:** 논리적 비약이나 계산 오류가 없어야 합니다. 풀이는 '1단계', '2단계' 또는 'Step 1', 'Step 2'와 같이 단계별로 명확히 서술하십시오.
@@ -983,12 +955,9 @@ def refine_final(api_key, draft, style_img, grade, subject=None, lang="Korean"):
     6. **그림 코드:** matplotlib 사용 시 plt.show()를 포함하지 마십시오. 코드 줄바꿈에 백슬래시(\\)를 사용하지 마십시오.
     7. **그림 검증:** 그림에 정답이나 풀이 과정이 포함되어 있다면 제거하고, 문제의 초기 상태만 그리도록 코드를 수정하십시오.
     8. **성취기준:** 해당 문제가 속한 대한민국 교육과정 성취기준 코드(예: [10수학01-01])를 분석하여 작성하십시오. (대학수학은 관련 전공 주제 명시)
-
     {validation_prompt}
-
     [입력된 초안]
     {draft}
-
     [최종 출력 JSON 포맷]
     {{ "concept": "핵심 개념", "problem": "수정된 문제 내용", "hint": "힌트", "answer": "검증된 정답", "solution": "검증된 상세 풀이 (줄바꿈 필수)", "drawing_code": "Python 코드", "achievement_standard": "성취기준" }}
     """
@@ -1000,7 +969,6 @@ def refine_final(api_key, draft, style_img, grade, subject=None, lang="Korean"):
         parts.append({"inline_data": {"mime_type": "image/jpeg", "data": s_str}})
     payload = {"contents": [{"parts": parts}], "safetySettings": [{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}], "generationConfig": {"temperature": 0.8, "response_mime_type": "application/json"}}
     return GeminiClient.call_api(api_key, payload)
-
 # =========================================================================
 # 6. UI Dialogs
 # =========================================================================
@@ -1034,11 +1002,9 @@ def dialog_options():
     st.divider()
     if st.button(T("opt_save"), type="primary", use_container_width=True):
         st.rerun()
-
 @st.dialog("📖 Guide")
 def dialog_guide():
     st.markdown(T("guide_md"))
-
 @st.dialog("📚 Materials")
 def dialog_materials():
     st.caption(T("mat_caption"))
@@ -1052,7 +1018,6 @@ def dialog_materials():
             if not err:
                 st.session_state['curriculum_text'] += "\n" + txt
         st.success(T("mat_success"))
-
 @st.dialog("🖼️ Style")
 def dialog_style():
     st.caption(T("style_caption"))
@@ -1064,7 +1029,6 @@ def dialog_style():
             st.image(st.session_state['style_img'], caption=T("style_current"), use_container_width=True)
         except:
             st.error("스타일 적용 실패")
-
 @st.dialog("🎨 Theme")
 def dialog_theme():
     st.caption(T("theme_caption"))
@@ -1080,14 +1044,12 @@ def dialog_theme():
         st.session_state['theme_bg'] = b
         st.session_state['theme_text'] = t
         st.rerun()
-
 @st.dialog("🗑️ Data")
 def dialog_data():
     st.warning(T("data_warn"))
     if st.button(T("data_clear"), type="primary", key="btn_clear_hist"):
         st.session_state['history'] = []
         st.rerun()
-
 # =========================================================================
 # 7. Main Application Logic
 # =========================================================================
@@ -1237,7 +1199,6 @@ def apply_custom_css():
         }}
         </style>
     """, unsafe_allow_html=True)
-
 def main_app_interface():
     st.markdown("""
         <div class="logo-container">
@@ -1314,7 +1275,8 @@ def main_app_interface():
                 with st.container():
                     st.markdown(f'<div class="result-card"><div class="result-header">{T("result_card")}</div>', unsafe_allow_html=True)
                     with st.container(border=True):
-                        st.markdown(f"**Q.** {normalize_latex_text(data.get('problem'))}")
+                        # 안전 장치 추가: str()으로 강제 문자열 변환
+                        st.markdown(f"**Q.** {normalize_latex_text(str(data.get('problem', '')))}")
                     st.markdown('</div>', unsafe_allow_html=True)
                 d_code = data.get('drawing_code')
                 if d_code and "plt" in d_code:
@@ -1375,7 +1337,8 @@ def main_app_interface():
                     with st.expander(f"{item['time']} - {item['grade']} ({item['difficulty']})"):
                         data = item['data']
                         st.markdown(f"**Concept:** {data.get('concept')}")
-                        st.markdown(f"**Problem:** {normalize_latex_text(data.get('problem'))}")
+                        # 히스토리에서도 안전 장치 추가
+                        st.markdown(f"**Problem:** {normalize_latex_text(str(data.get('problem')))}")
                         st.markdown(f"**Answer:** {data.get('answer')}")
                         st.markdown(f"**Solution:** {normalize_latex_text(data.get('solution'))}")
                         if st.button(T("delete"), key=f"del_{i}"):
@@ -1384,10 +1347,8 @@ def main_app_interface():
                 st.download_button(T("zip_download"), PDFGenerator.create_history_zip(st.session_state['history']), file_name="history.zip", mime="application/zip", use_container_width=True)
                 st.download_button(T("csv_download"), PDFGenerator.convert_history_to_csv(st.session_state['history']), file_name="history.csv", mime="text/csv", use_container_width=True)
     display_bottom_ad()
-
 def main():
     apply_custom_css()
     main_app_interface()
-
 if __name__ == "__main__":
     main()
