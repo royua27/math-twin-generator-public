@@ -240,7 +240,7 @@ def display_bottom_ad():
         bottom: 10px;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 999;
+        z-index: 10000;
         width: 90%;
         max-width: 810px;
         background: linear-gradient(135deg, #2F2E35 0%, #1A1C24 100%);
@@ -863,7 +863,7 @@ def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, st
         elif subject in ["Calculus", "Differential Geometry"]:
             drawing_constraint = "6. **그림 생성 필수 권장:** 이 분야(미적분/기하)는 시각적 이해가 중요하므로, matplotlib 코드를 적극적으로 생성하여 그래프나 도형을 제공하십시오."
     if temperature < 0.3:
-        mode_desc = "Change numbers/symbols only (Maintain Structure)"
+        mode_desc = "Change numbers/symbols only (Maintain Segment)"
     elif temperature < 0.7:
         mode_desc = "Change context but maintain core concept"
     else:
@@ -1309,7 +1309,7 @@ def main_app_interface():
                 pdf_bytes = PDFGenerator.create_single_pdf(data, title, fig_img, internal_mode)
                 if pdf_bytes:
                     st.download_button(T("download_pdf"), data=bytes(pdf_bytes), file_name=f"{title}.pdf", mime="application/pdf", use_container_width=True)
-                st.success("팁: 이 문제가 마음에 드셨나요? 더 많은 자료는 아래 링크를 확인해보세요!")
+                st.success("팁:, 이 문제가 마음에 드셨나요? 더 많은 자료는 아래 링크를 확인해보세요!")
                 st.markdown("""
                 <a href="https://www.yes24.com" target="_blank">
                     <div style="background-color: #f0f2f6; padding: 15px; border-radius: 8px; text-align: center; color: #333;">
