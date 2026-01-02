@@ -382,7 +382,7 @@ def validate_python_code(code):
         if kw in code:
             return False, f"Security Risk: {kw}"
     return True, "Safe"
-def split_long_latex(text, limit=75):
+def split_long_latex(text, limit=80):
     if not text:
         return ""
     if not isinstance(text, str):
@@ -390,33 +390,17 @@ def split_long_latex(text, limit=75):
     def replacer(match):
         content = match.group(0)
         inner = content[1:-1].strip()
-        if r'\begin{' in inner:
+        if r'\begin{' in inner or len(inner) < limit:
             return content
-        if len(inner) < limit:
-            return content
+        # = 로만 분리 (긴 계산식 줄바꿈 방지)
         if " = " in inner:
             parts = inner.split(" = ")
             new_inner = parts[0].strip()
             for part in parts[1:]:
-                new_inner += "\n\n=" + part.strip()
+                new_inner += " = " + part.strip()
             return f"${new_inner}$"
-        elif "=" in inner:
-            parts = inner.split("=")
-            new_inner = parts[0].strip()
-            for part in parts[1:]:
-                new_inner += "\n\n=" + part.strip()
-            return f"${new_inner}$"
-        for op in [" + ", " - "]:
-            if op in inner:
-                parts = inner.split(op)
-                new_inner = parts[0].strip()
-                for part in parts[1:]:
-                    new_inner += "\n\n" + op.strip() + part.strip()
-                return f"${new_inner}$"
         return content
-    processed = re.sub(r'\$.*?\$', replacer, text, flags=re.DOTALL)
-    processed = re.sub(r'\$\s+', '$', processed)
-    processed = re.sub(r'\s+\$', '$', processed)
+    processed = re.sub(r'\$[^\$]{' + str(limit) + r',}\$', replacer, text, flags=re.DOTALL)
     return processed
 def get_base64_of_bin_file(bin_file):
     data = bin_file.read()
@@ -451,7 +435,7 @@ def parse_gemini_json_response(text):
                 else:
                     data[key] = normalize_latex_text(data[key])
                     if key in ['solution', 'problem']:
-                        data[key] = split_long_latex(data[key], limit=75)
+                        data[key] = split_long_latex(data[key], limit=80)
         return data
     except json.JSONDecodeError:
         try:
