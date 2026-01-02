@@ -139,17 +139,50 @@ UI_TEXT = {
         "delete": "삭제",
         "create_workbook": "📚 워크북 생성",
         "no_history": "기록이 없습니다.",
-        # [수정] 팁 영역: YES24 관련 내용으로 변경
         "tip_title": "📚 선생님을 위한 추천 도서",
-        "tip_content": "수업 퀄리티를 높여줄 필독서와 베스트셀러 문제집을 확인해보세요!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>YES24 베스트셀러 보러가기</a>",
+        "tip_content": "수업 퀄리티를 높여줄 필독서와 베스트셀러 문제집을 확인해보세요!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>베스트셀러 보러가기</a>",
         "ad_title": "🔥 선생님 필수템",
         "ad_content": "수학 교구 모음전",
         "ad_click": "(클릭하여 보기)",
-        # 하단 광고 텍스트 (동적으로 변경됨)
         "bottom_ad_prefix": "🚀 ",
         "bottom_ad_suffix": " 수학 성적 수직 상승의 비밀?",
         "bottom_ad_desc": "AI가 만든 문제로 부족하다면? <b>가장 많이 팔리는 문제집</b>을 확인해보세요.",
-        "bottom_ad_btn": "🏆 쿠팡 최저가 보러가기"
+        "bottom_ad_btn": "🏆 최저가 보러가기",
+        
+        # Dialogs
+        "dialog_opt_title": "📝 옵션",
+        "dialog_guide_title": "📖 가이드",
+        "dialog_mat_title": "📚 자료함",
+        "dialog_style_title": "🖼️ 스타일",
+        "dialog_theme_title": "🎨 테마",
+        "dialog_data_title": "🗑️ 데이터 관리",
+        "opt_caption": "문제 생성 설정",
+        "opt_grade": "학년",
+        "opt_subject": "과목",
+        "opt_diff": "난이도",
+        "opt_type": "문제 유형",
+        "opt_save": "저장 및 닫기",
+        "guide_md": """### 사용 방법
+1. **🔑 API**: Google Gemini API 키를 입력하세요.
+2. **📝 옵션**: 학년과 난이도를 설정하세요.
+3. **📸 업로드**: 문제 이미지를 드래그 앤 드롭하세요.
+4. **✨ 생성**: 버튼을 클릭하세요!""",
+        "mat_caption": "참고 자료 업로드 (PDF/TXT)",
+        "mat_loaded": "로딩됨: {len} 자",
+        "mat_upload": "파일 업로드",
+        "mat_success": "자료가 추가되었습니다!",
+        "style_caption": "스타일 참조 이미지 업로드",
+        "style_label": "참조 이미지",
+        "style_success": "스타일이 적용되었습니다!",
+        "style_current": "현재 스타일",
+        "theme_caption": "색상 사용자 정의",
+        "theme_primary": "기본 색상 (Primary)",
+        "theme_bg": "배경 색상",
+        "theme_text": "텍스트 색상",
+        "theme_bg_img": "배경 이미지",
+        "theme_apply": "테마 적용",
+        "data_warn": "이 작업은 되돌릴 수 없습니다.",
+        "data_clear": "모든 기록 삭제"
     },
     "English": {
         "guide_btn": "📖 Guide",
@@ -181,7 +214,6 @@ UI_TEXT = {
         "delete": "Delete",
         "create_workbook": "📚 Create Workbook",
         "no_history": "No history yet.",
-        # [Edited] Tip Section: Changed to Recommended Books
         "tip_title": "📚 Recommended Books",
         "tip_content": "Check out the best-selling textbooks and must-read books for teachers!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>Go to YES24</a>",
         "ad_title": "🔥 Must-Have Items",
@@ -190,12 +222,62 @@ UI_TEXT = {
         "bottom_ad_prefix": "🚀 ",
         "bottom_ad_suffix": " Math Grades Booster!",
         "bottom_ad_desc": "Need more than AI problems? Check out the <b>Best Selling Workbooks</b>.",
-        "bottom_ad_btn": "🏆 View Best Prices on Coupang"
+        "bottom_ad_btn": "🏆 View Best Prices",
+        
+        # Dialogs
+        "dialog_opt_title": "📝 Options",
+        "dialog_guide_title": "📖 User Guide",
+        "dialog_mat_title": "📚 Materials",
+        "dialog_style_title": "🖼️ Style Reference",
+        "dialog_theme_title": "🎨 Theme Settings",
+        "dialog_data_title": "🗑️ Data Management",
+        "opt_caption": "Customize problem generation",
+        "opt_grade": "Grade",
+        "opt_subject": "Subject",
+        "opt_diff": "Diff",
+        "opt_type": "Type",
+        "opt_save": "Save & Close",
+        "guide_md": """### How to Use
+1. **🔑 API**: Enter Google Gemini API Key.
+2. **📝 Options**: Set grade & difficulty.
+3. **📸 Upload**: Drag & drop problem image.
+4. **✨ Generate**: Click button!""",
+        "mat_caption": "Upload reference materials (PDF/TXT)",
+        "mat_loaded": "Loaded: {len} chars",
+        "mat_upload": "Upload Files",
+        "mat_success": "Materials Added!",
+        "style_caption": "Upload an image to mimic its visual style",
+        "style_label": "Reference Image",
+        "style_success": "Style Applied!",
+        "style_current": "Current Style",
+        "theme_caption": "Customize colors",
+        "theme_primary": "Primary",
+        "theme_bg": "Background",
+        "theme_text": "Text",
+        "theme_bg_img": "Background Image",
+        "theme_apply": "Apply Theme",
+        "data_warn": "This action cannot be undone.",
+        "data_clear": "Clear All History"
     }
 }
 
 def T(key):
     return UI_TEXT[st.session_state['language']].get(key, key)
+
+# Helper for option translation display
+def get_option_label(option):
+    if st.session_state['language'] == 'Korean':
+        K_MAP = {
+            "Elementary 3": "초등학교 3학년", "Elementary 4": "초등학교 4학년", "Elementary 5": "초등학교 5학년", "Elementary 6": "초등학교 6학년",
+            "Middle 1": "중학교 1학년", "Middle 2": "중학교 2학년", "Middle 3": "중학교 3학년",
+            "High 1": "고등학교 1학년", "High 2": "고등학교 2학년", "High 3": "고등학교 3학년",
+            "University Math": "대학수학",
+            "Maintain": "유지", "Easier": "쉽게", "Harder": "어렵게",
+            "Any": "랜덤/지정안함", "Multiple Choice": "객관식", "Essay": "주관식/서술형",
+            "Calculus": "미적분학", "Linear Algebra": "선형대수학", "Statistics": "통계학", "Topology": "위상수학", "Number Theory": "정수론"
+        }
+        return K_MAP.get(option, option)
+    return option
 
 # =========================================================================
 # 2. Ad & Marketing Components (광고 영역)
@@ -246,7 +328,7 @@ def display_sidebar_ads():
     st.sidebar.markdown(tip_html, unsafe_allow_html=True)
 
 def display_bottom_ad():
-    """화면 하단 배너 광고 (동적 타겟팅 적용)"""
+    """화면 하단 배너 광고 (동적 타겟팅 적용 - 컴팩트 버전)"""
     st.markdown("---")
     
     # 현재 선택된 학년 가져오기
@@ -263,32 +345,32 @@ def display_bottom_ad():
     # 현재는 예시로 검색 결과 페이지 링크를 넣었습니다.
     partners_link = f"https://www.coupang.com/np/search?component=&q={search_keyword}&channel=user"
     
-    # Premium Style Banner
+    # Premium Style Banner - Compact Version
     ad_html = f"""
     <div style="
         background: linear-gradient(135deg, #2F2E35 0%, #1A1C24 100%);
         border: 1px solid #e4c1b2;
         border-radius: 15px;
-        padding: 30px;
+        padding: 15px;
         text-align: center;
-        margin-top: 30px;
-        margin-bottom: 50px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        margin-top: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
     ">
-        <h3 style="color: #e4c1b2; margin-bottom: 10px; font-size: 1.5rem;">
+        <h3 style="color: #e4c1b2; margin-bottom: 5px; font-size: 1.3rem;">
             {T("bottom_ad_prefix")}{current_grade}{T("bottom_ad_suffix")}
         </h3>
-        <p style="color: #e0e0e0; margin-bottom: 25px; font-size: 1.1rem;">
+        <p style="color: #e0e0e0; margin-bottom: 15px; font-size: 1.0rem;">
             {T("bottom_ad_desc")}
         </p>
         <a href="{partners_link}" target="_blank" style="text-decoration: none;">
             <div style="
                 background-color: #008CFA; /* Coupang Blue */
                 color: white;
-                padding: 15px 40px;
+                padding: 10px 30px;
                 border-radius: 30px;
                 font-weight: 800;
-                font-size: 1.1rem;
+                font-size: 1.0rem;
                 display: inline-block;
                 transition: all 0.2s ease;
                 box-shadow: 0 4px 15px rgba(0, 140, 250, 0.3);
@@ -296,9 +378,6 @@ def display_bottom_ad():
                 {T("bottom_ad_btn")}
             </div>
         </a>
-        <p style="color: #888; font-size: 0.8rem; margin-top: 15px;">
-            * 이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
-        </p>
     </div>
     """
     st.markdown(ad_html, unsafe_allow_html=True)
@@ -1003,70 +1082,100 @@ def refine_final(api_key, draft, style_img, grade, subject=None, lang="Korean"):
 
 @st.dialog("📝 Options")
 def dialog_options():
-    st.caption("Customize problem generation")
-    g = st.selectbox("Grade", ["Middle 1", "Middle 2", "Middle 3", "High 1", "High 2", "High 3", "University Math"], index=0, key="opt_grade")
-    if g != st.session_state['grade']: st.session_state['grade'] = g
-    if st.session_state['grade'] == "University Math":
-        s = st.selectbox("Subject", ["Calculus", "Linear Algebra", "Statistics", "Topology", "Number Theory"], key="opt_subj")
-        st.session_state['subject'] = s
-    st.session_state['difficulty'] = st.radio("Diff", ["Maintain", "Easier", "Harder"], key="opt_diff")
-    st.session_state['prob_type'] = st.radio("Type", ["Any", "Multiple Choice", "Essay"], key="opt_type")
-    st.divider()
-    if st.button("Save & Close", type="primary", use_container_width=True): st.rerun()
+    # Use T() for title? The decorator title is set at definition time.
+    # To support dynamic title, we need to pass the title to the function and use st.markdown or header inside,
+    # OR define the dialog function inside the main loop (which is less efficient).
+    # Since st.dialog is a decorator, let's keep the title static or update it via a rerun if possible.
+    # For now, we update the content.
+    st.caption(T("opt_caption"))
+    
+    # Grade Selection
+    current_grade = st.session_state['grade']
+    # Use index to set default
+    grade_options = ["Middle 1", "Middle 2", "Middle 3", "High 1", "High 2", "High 3", "University Math"]
+    try:
+        idx = grade_options.index(current_grade)
+    except:
+        idx = 0
+    
+    # Use format_func to display translated labels
+    g = st.selectbox(T("opt_grade"), grade_options, index=idx, format_func=get_option_label, key="opt_grade")
+    
+    if g != st.session_state['grade']: 
+        st.session_state['grade'] = g
+        st.rerun()
 
-@st.dialog("📖 User Guide")
+    if st.session_state['grade'] == "University Math":
+        s = st.selectbox(T("opt_subject"), ["Calculus", "Linear Algebra", "Statistics", "Topology", "Number Theory"], format_func=get_option_label, key="opt_subj")
+        st.session_state['subject'] = s
+    
+    # Difficulty
+    diff_opts = ["Maintain", "Easier", "Harder"]
+    try:
+        d_idx = diff_opts.index(st.session_state['difficulty'])
+    except:
+        d_idx = 0
+    st.session_state['difficulty'] = st.radio(T("opt_diff"), diff_opts, index=d_idx, format_func=get_option_label, key="opt_diff")
+    
+    # Type
+    type_opts = ["Any", "Multiple Choice", "Essay"]
+    try:
+        t_idx = type_opts.index(st.session_state['prob_type'])
+    except:
+        t_idx = 0
+    st.session_state['prob_type'] = st.radio(T("opt_type"), type_opts, index=t_idx, format_func=get_option_label, key="opt_type")
+
+    st.divider()
+    if st.button(T("opt_save"), type="primary", use_container_width=True): 
+        st.rerun()
+
+@st.dialog("📖 Guide") # Title remains static or needs a workaround for dynamic update
 def dialog_guide():
-    st.markdown("""
-    ### How to Use
-    1. **🔑 API**: Enter Google Gemini API Key.
-    2. **📝 Options**: Set grade & difficulty.
-    3. **📸 Upload**: Drag & drop problem image.
-    4. **✨ Generate**: Click button!
-    """)
+    st.markdown(T("guide_md"))
 
 @st.dialog("📚 Materials")
 def dialog_materials():
-    st.caption("Upload reference materials (PDF/TXT)")
+    st.caption(T("mat_caption"))
     curr_len = len(st.session_state.get('curriculum_text', ''))
     st.progress(min(curr_len / 30000, 1.0))
-    st.caption(f"Loaded: {curr_len} chars")
-    uploaded_refs = st.file_uploader("Upload Files", type=['pdf', 'txt'], accept_multiple_files=True, key="mat_upload")
+    st.caption(T("mat_loaded").format(len=curr_len))
+    uploaded_refs = st.file_uploader(T("mat_upload"), type=['pdf', 'txt'], accept_multiple_files=True, key="mat_upload")
     if uploaded_refs:
         for u_file in uploaded_refs:
             txt, err = extract_text_safe(u_file)
             if not err: st.session_state['curriculum_text'] += "\n" + txt
-        st.success("Materials Added!")
+        st.success(T("mat_success"))
 
-@st.dialog("🖼️ Style Reference")
+@st.dialog("🖼️ Style")
 def dialog_style():
-    st.caption("Upload an image to mimic its visual style")
-    s_file = st.file_uploader("Reference Image", type=['png', 'jpg'], key="style_upload")
+    st.caption(T("style_caption"))
+    s_file = st.file_uploader(T("style_label"), type=['png', 'jpg'], key="style_upload")
     if s_file:
         try: 
             st.session_state['style_img'] = pdf_to_image(s_file) if s_file.type == "application/pdf" else Image.open(s_file)
-            st.success("Style Applied!")
-            st.image(st.session_state['style_img'], caption="Current Style", use_container_width=True)
-        except: st.error("Failed to load image")
+            st.success(T("style_success"))
+            st.image(st.session_state['style_img'], caption=T("style_current"), use_container_width=True)
+        except: st.error(T("style_fail"))
 
-@st.dialog("🎨 Theme Settings")
+@st.dialog("🎨 Theme")
 def dialog_theme():
-    st.caption("Customize colors")
+    st.caption(T("theme_caption"))
     c1, c2, c3 = st.columns(3)
-    p = c1.color_picker("Primary", st.session_state['theme_primary'], key="cp_p")
-    b = c2.color_picker("Background", st.session_state['theme_bg'], key="cp_b")
-    t = c3.color_picker("Text", st.session_state['theme_text'], key="cp_t")
-    bg_img = st.file_uploader("Background Image", type=['png', 'jpg', 'jpeg'], key="bg_upload")
+    p = c1.color_picker(T("theme_primary"), st.session_state['theme_primary'], key="cp_p")
+    b = c2.color_picker(T("theme_bg"), st.session_state['theme_bg'], key="cp_b")
+    t = c3.color_picker(T("theme_text"), st.session_state['theme_text'], key="cp_t")
+    bg_img = st.file_uploader(T("theme_bg_img"), type=['png', 'jpg', 'jpeg'], key="bg_upload")
     if bg_img: st.session_state['bg_image_file'] = bg_img
-    if st.button("Apply Theme", key="btn_apply_theme"):
+    if st.button(T("theme_apply"), key="btn_apply_theme"):
         st.session_state['theme_primary'] = p
         st.session_state['theme_bg'] = b
         st.session_state['theme_text'] = t
         st.rerun()
 
-@st.dialog("🗑️ Data Management")
+@st.dialog("🗑️ Data")
 def dialog_data():
-    st.warning("This action cannot be undone.")
-    if st.button("Clear All History", type="primary", key="btn_clear_hist"):
+    st.warning(T("data_warn"))
+    if st.button(T("data_clear"), type="primary", key="btn_clear_hist"):
         st.session_state['history'] = []
         st.rerun()
 
