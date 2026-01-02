@@ -1,13 +1,14 @@
 import streamlit as st
 
 st.set_page_config(
-    page_title="수학 변형 문제 생성기 - 수학 내신 대비, 오답 노트, 변형 문제 제작을 위한 무료 도구입니다.",  # 브라우저 탭과 검색 결과 제목
+    page_title="수학 변형 문제 생성기",  # 브라우저 탭과 검색 결과 제목
     page_icon="➗",  # 탭에 보이는 아이콘
     layout="centered",
     initial_sidebar_state="expanded",
     menu_items={
         'Get Help': 'https://github.com/royua',
         'Report a bug': "https://github.com/royua",
+        'About': "# 수학 변형 문제 생성기 - 수학 내신 대비, 오답 노트, 변형 문제 제작을 위한 무료 도구... 5초 후 페이지로 이동합니다."
     }
 )
 
@@ -1358,6 +1359,7 @@ def main():
     main_app_interface()
 if __name__ == "__main__":
     main()
+
 
 
 
