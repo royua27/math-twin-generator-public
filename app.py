@@ -221,17 +221,17 @@ def display_bottom_ad():
     current_grade = st.session_state.get('grade', '')
     # 학년별 고정 쿠팡 파트너스 링크 매핑 (사용자가 직접 입력할 수 있도록 아래 링크 수정)
     partner_links = {
-        "Elementary 3": "https://www.coupang.com/여기에_초3_파트너스_링크_입력",
-        "Elementary 4": "https://www.coupang.com/여기에_초4_파트너스_링크_입력",
-        "Elementary 5": "https://www.coupang.com/여기에_초5_파트너스_링크_입력",
-        "Elementary 6": "https://www.coupang.com/여기에_초6_파트너스_링크_입력",
-        "Middle 1": "https://www.coupang.com/여기에_중1_파트너스_링크_입력",
-        "Middle 2": "https://www.coupang.com/여기에_중2_파트너스_링크_입력",
-        "Middle 3": "https://www.coupang.com/여기에_중3_파트너스_링크_입력",
-        "High 1": "https://www.coupang.com/여기에_고1_파트너스_링크_입력",
-        "High 2": "https://www.coupang.com/여기에_고2_파트너스_링크_입력",
-        "High 3": "https://www.coupang.com/여기에_고3_파트너스_링크_입력",
-        "University Math": "https://www.coupang.com/여기에_대학수학_파트너스_링크_입력"
+        "Elementary 3": "https://link.coupang.com/a/dkdNVP",
+        "Elementary 4": "https://link.coupang.com/a/dkdObk",
+        "Elementary 5": "https://link.coupang.com/a/dkdOs7",
+        "Elementary 6": "https://link.coupang.com/a/dkdOMi",
+        "Middle 1": "https://link.coupang.com/a/dkdQyE",
+        "Middle 2": "https://link.coupang.com/a/dkdQUK",
+        "Middle 3": "https://link.coupang.com/a/dkdRia",
+        "High 1": "https://link.coupang.com/a/dkdRHv",
+        "High 2": "https://link.coupang.com/a/dkdR1Q",
+        "High 3": "https://link.coupang.com/a/dkdSxf",
+        "University Math": "https://link.coupang.com/a/dkdSxf"
     }
     partners_link = partner_links.get(current_grade, "https://www.coupang.com/np/search?q=수학+문제집")
     ad_html = f"""
@@ -1342,3 +1342,4 @@ def main():
     main_app_interface()
 if __name__ == "__main__":
     main()
+
