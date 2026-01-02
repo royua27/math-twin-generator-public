@@ -139,11 +139,17 @@ UI_TEXT = {
         "delete": "삭제",
         "create_workbook": "📚 워크북 생성",
         "no_history": "기록이 없습니다.",
-        "tip_title": "💡 Tip",
-        "tip_content": "문제를 만드느라 힘드셨죠?<br><a href='https://www.starbucks.co.kr' target='_blank' style='color: #4CAF50; text-decoration: underline;'>여기서 커피 한 잔 하세요!</a>",
+        # [수정] 팁 영역: YES24 관련 내용으로 변경
+        "tip_title": "📚 선생님을 위한 추천 도서",
+        "tip_content": "수업 퀄리티를 높여줄 필독서와 베스트셀러 문제집을 확인해보세요!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>YES24 베스트셀러 보러가기</a>",
         "ad_title": "🔥 선생님 필수템",
         "ad_content": "수학 교구 모음전",
-        "ad_click": "(클릭하여 보기)"
+        "ad_click": "(클릭하여 보기)",
+        # 하단 광고 텍스트 (동적으로 변경됨)
+        "bottom_ad_prefix": "🚀 ",
+        "bottom_ad_suffix": " 수학 성적 수직 상승의 비밀?",
+        "bottom_ad_desc": "AI가 만든 문제로 부족하다면? <b>가장 많이 팔리는 문제집</b>을 확인해보세요.",
+        "bottom_ad_btn": "🏆 쿠팡 최저가 보러가기"
     },
     "English": {
         "guide_btn": "📖 Guide",
@@ -175,11 +181,16 @@ UI_TEXT = {
         "delete": "Delete",
         "create_workbook": "📚 Create Workbook",
         "no_history": "No history yet.",
-        "tip_title": "💡 Tip",
-        "tip_content": "Need a break?<br><a href='https://www.starbucks.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>Have a coffee here!</a>",
+        # [Edited] Tip Section: Changed to Recommended Books
+        "tip_title": "📚 Recommended Books",
+        "tip_content": "Check out the best-selling textbooks and must-read books for teachers!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>Go to YES24</a>",
         "ad_title": "🔥 Must-Have Items",
         "ad_content": "Math Teaching Aids",
-        "ad_click": "(Click to view)"
+        "ad_click": "(Click to view)",
+        "bottom_ad_prefix": "🚀 ",
+        "bottom_ad_suffix": " Math Grades Booster!",
+        "bottom_ad_desc": "Need more than AI problems? Check out the <b>Best Selling Workbooks</b>.",
+        "bottom_ad_btn": "🏆 View Best Prices on Coupang"
     }
 }
 
@@ -223,7 +234,7 @@ def display_sidebar_ads():
     """
     st.sidebar.markdown(ad_html, unsafe_allow_html=True)
     
-    # [광고 2] 팁 영역
+    # [광고 2] 팁 영역 (YES24 도서 추천)
     tip_html = f"""
     <div style="margin-top: 10px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 8px; border-left: 3px solid #e4c1b2;">
         <div style="color: #e4c1b2; font-weight: bold; font-size: 0.9em; margin-bottom: 5px;">{T("tip_title")}</div>
@@ -233,6 +244,64 @@ def display_sidebar_ads():
     </div>
     """
     st.sidebar.markdown(tip_html, unsafe_allow_html=True)
+
+def display_bottom_ad():
+    """화면 하단 배너 광고 (동적 타겟팅 적용)"""
+    st.markdown("---")
+    
+    # 현재 선택된 학년 가져오기
+    current_grade = st.session_state.get('grade', '')
+    
+    # 학년별 검색 키워드 매핑 (쿠팡 검색용)
+    search_keyword = "수학문제집"
+    if "Elementary" in current_grade or "초등" in current_grade: search_keyword = "초등수학문제집"
+    elif "Middle" in current_grade or "중학" in current_grade: search_keyword = "중등수학문제집"
+    elif "High" in current_grade or "고등" in current_grade: search_keyword = "고등수학문제집"
+    elif "University" in current_grade: search_keyword = "대학수학 전공서적"
+
+    # 파트너스 링크 (여기에 선생님의 쿠팡 파트너스 트래킹 링크를 넣으면 됩니다)
+    # 현재는 예시로 검색 결과 페이지 링크를 넣었습니다.
+    partners_link = f"https://www.coupang.com/np/search?component=&q={search_keyword}&channel=user"
+    
+    # Premium Style Banner
+    ad_html = f"""
+    <div style="
+        background: linear-gradient(135deg, #2F2E35 0%, #1A1C24 100%);
+        border: 1px solid #e4c1b2;
+        border-radius: 15px;
+        padding: 30px;
+        text-align: center;
+        margin-top: 30px;
+        margin-bottom: 50px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    ">
+        <h3 style="color: #e4c1b2; margin-bottom: 10px; font-size: 1.5rem;">
+            {T("bottom_ad_prefix")}{current_grade}{T("bottom_ad_suffix")}
+        </h3>
+        <p style="color: #e0e0e0; margin-bottom: 25px; font-size: 1.1rem;">
+            {T("bottom_ad_desc")}
+        </p>
+        <a href="{partners_link}" target="_blank" style="text-decoration: none;">
+            <div style="
+                background-color: #008CFA; /* Coupang Blue */
+                color: white;
+                padding: 15px 40px;
+                border-radius: 30px;
+                font-weight: 800;
+                font-size: 1.1rem;
+                display: inline-block;
+                transition: all 0.2s ease;
+                box-shadow: 0 4px 15px rgba(0, 140, 250, 0.3);
+            " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(0, 140, 250, 0.5)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 15px rgba(0, 140, 250, 0.3)';">
+                {T("bottom_ad_btn")}
+            </div>
+        </a>
+        <p style="color: #888; font-size: 0.8rem; margin-top: 15px;">
+            * 이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+        </p>
+    </div>
+    """
+    st.markdown(ad_html, unsafe_allow_html=True)
 
 # =========================================================================
 # 3. Utilities & Logic (원본 기능 100% 복구)
@@ -1157,6 +1226,15 @@ def apply_custom_css():
         [data-testid="stFileUploader"] div[data-testid="stMarkdownContainer"] p {{
             color: {primary} !important;
         }}
+        /* Drag and Drop Text Styling */
+        [data-testid="stFileUploader"] .st-emotion-cache-1fttcpj {{
+            color: {primary} !important;
+        }}
+        /* Upload Icon Color */
+        [data-testid="stFileUploader"] svg {{
+            fill: {primary} !important;
+            color: {primary} !important;
+        }}
         </style>
     """, unsafe_allow_html=True)
 
@@ -1296,62 +1374,9 @@ def main_app_interface():
                 """, unsafe_allow_html=True)
             else:
                 st.info("Upload and generate to see results.")
-
-        with tab_hist:
-            if st.session_state['history']:
-                c_h_txt, c_h_btn1, c_h_btn2 = st.columns([3, 1, 1])
-                c_h_txt.write(T("recent_history"))
-                if c_h_btn1.button(T("zip_download"), use_container_width=True):
-                    zip_data = PDFGenerator.create_history_zip(st.session_state['history'])
-                    st.download_button("Download ZIP", data=zip_data, file_name="math_problems.zip", mime="application/zip")
-                if c_h_btn2.button(T("csv_download"), use_container_width=True):
-                    csv_data = PDFGenerator.convert_history_to_csv(st.session_state['history'])
-                    st.download_button("Download CSV", data=csv_data, file_name="history.csv", mime="text/csv")
-
-                if 'selected_indices' not in st.session_state: st.session_state['selected_indices'] = []
-                if st.checkbox(T("select_all"), key='chk_all'):
-                     st.session_state['selected_indices'] = list(range(len(st.session_state['history'])))
-                else:
-                     if len(st.session_state['selected_indices']) == len(st.session_state['history']):
-                         st.session_state['selected_indices'] = []
-
-                selected_items = []
-                for i, item in enumerate(st.session_state['history']):
-                    is_sel = i in st.session_state['selected_indices']
-                    col_chk, col_content = st.columns([0.05, 0.95])
-                    with col_chk:
-                        chk = st.checkbox("Select", value=is_sel, key=f"chk_{i}", label_visibility="collapsed")
-                    if chk:
-                        if i not in st.session_state['selected_indices']: st.session_state['selected_indices'].append(i)
-                        selected_items.append(item)
-                    else:
-                        if i in st.session_state['selected_indices']: st.session_state['selected_indices'].remove(i)
-
-                    with col_content:
-                        grade_label = f"**[{item.get('grade', '?')}/{item.get('difficulty', '?')}]**"
-                        prob_preview = normalize_latex_text(item['data'].get('problem', ''))
-                        st.markdown(f"{grade_label} {prob_preview}")
-                        with st.expander(T("view_details")):
-                            st.markdown(normalize_latex_text(item['data'].get('problem')))
-                            st.divider()
-                            st.write(f"**Answer:** {item['data'].get('answer')}")
-                            if st.button(T("delete"), key=f"del_{i}"):
-                                st.session_state['history'].pop(i)
-                                st.rerun()
-                    st.divider()
-
-                if selected_items:
-                    st.divider()
-                    c_w_tit, c_w_mode = st.columns([3, 1])
-                    wb_title = c_w_tit.text_input("Workbook Title", value="My Math Workbook")
-                    wb_mode = c_w_mode.selectbox("Workbook Mode", ["Integrated", "Problem Only", "Solution Only"])
-                    if st.button(f"{T('create_workbook')} ({len(selected_items)} problems)"):
-                        with st.spinner("Creating Workbook..."):
-                            wb_bytes = PDFGenerator.create_workbook_pdf(selected_items, wb_title, wb_mode)
-                            if wb_bytes:
-                                st.download_button("📥 Download Workbook", data=bytes(wb_bytes), file_name="workbook.pdf", mime="application/pdf", use_container_width=True)
-            else:
-                st.info(T("no_history"))
+    
+    # [NEW] Call bottom ad
+    display_bottom_ad()
 
 def main():
     apply_custom_css()
