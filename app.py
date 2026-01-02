@@ -338,10 +338,11 @@ def display_bottom_ad():
     elif "High" in current_grade or "고등" in current_grade: search_keyword = "고등수학문제집"
     elif "University" in current_grade: search_keyword = "대학수학 전공서적"
 
-    # 파트너스 링크
+    # 파트너스 링크 (여기에 선생님의 쿠팡 파트너스 트래킹 링크를 넣으면 됩니다)
+    # 현재는 예시로 검색 결과 페이지 링크를 넣었습니다.
     partners_link = f"https://www.coupang.com/np/search?component=&q={search_keyword}&channel=user"
     
-    # Premium Style Banner - Fixed Bottom, Compact Version (0.7x size), Centered
+    # Premium Style Banner - Fixed Bottom, Compact Version, No Disclaimer
     ad_html = f"""
     <div style="
         position: fixed;
@@ -1345,6 +1346,7 @@ def apply_custom_css():
         /* Answer & Solution Border Fix */
         [data-testid="stVerticalBlockBorderWrapper"] {{
              border-color: {primary} !important;
+             border-width: 2px !important;
         }}
         </style>
     """, unsafe_allow_html=True)
@@ -1445,8 +1447,12 @@ def main_app_interface():
                         code = clean_python_code(d_code)
                         plt.clf(); plt.close('all'); fig = plt.figure()
                         exec(code, {'plt': plt, 'np': np})
-                        st.pyplot(fig)
-                        st.session_state['generated_figure'] = fig 
+                        # Check if anything was actually plotted
+                        if len(fig.get_axes()) > 0: 
+                            st.pyplot(fig)
+                            st.session_state['generated_figure'] = fig
+                        else:
+                            st.session_state['generated_figure'] = None
                     except: pass
                 
                 # Answer & Solution wrapped in bordered container
@@ -1485,6 +1491,7 @@ def main_app_interface():
                      st.download_button(T("download_pdf"), data=bytes(pdf_bytes), file_name=f"{title}.pdf", mime="application/pdf", use_container_width=True)
                 
                 # [결과 하단 광고]
+                st.success("팁: 이 문제가 마음에 드셨나요? 더 많은 자료는 아래 링크를 확인해보세요!")
                 st.markdown("""
                 <a href="https://www.yes24.com" target="_blank">
                     <div style="background-color: #f0f2f6; padding: 15px; border-radius: 8px; text-align: center; color: #333;">
