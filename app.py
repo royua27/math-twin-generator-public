@@ -74,13 +74,10 @@ def setup_fonts():
 
     if os.path.exists(FONT_PATH):
         try:
-            # 폰트 매니저에 폰트 추가
             fm.fontManager.addfont(FONT_PATH)
-            
-            # [Fix] 전역 폰트 설정 (한글 + 수식)
-            # NanumGothic을 기본으로 하되, 수식은 cm(Computer Modern) 사용
-            plt.rcParams['font.family'] = ['NanumGothic', 'DejaVu Sans'] # Fallback
-            plt.rcParams['mathtext.fontset'] = 'cm' 
+            # [Fix] Set font globally for Matplotlib to handle mixed content better
+            plt.rcParams['font.family'] = 'NanumGothic'
+            plt.rcParams['mathtext.fontset'] = 'cm' # Use Computer Modern for math
             plt.rcParams['axes.unicode_minus'] = False
             font_ready = True
         except: pass
@@ -286,8 +283,10 @@ def get_option_label(option):
 
 def display_sidebar_ads():
     """사이드바 광고 배너 영역"""
+    # [Design Fix] Reduced spacing for sidebar elements via markdown CSS injection
     st.sidebar.markdown("""
         <style>
+        /* Reduce spacing in sidebar - Adjusted from -15px to -5px */
         [data-testid="stSidebar"] .stMarkdown, [data-testid="stSidebar"] .stButton {
             margin-bottom: -5px !important;
         }
@@ -301,6 +300,7 @@ def display_sidebar_ads():
     st.sidebar.markdown("---")
     st.sidebar.header(T("sidebar_header"))
     
+    # [광고 1] 쿠팡/YES24 파트너스 링크 (밝은 배경)
     ad_html = f"""
     <div style="text-align: center; margin-bottom: 15px; background-color: #2F2E35; padding: 10px; border-radius: 10px; border: 1px solid #403e41;">
         <p style="color: #e4c1b2; font-size: 0.9em; margin-bottom: 5px;">{T("ad_title")}</p>
@@ -314,6 +314,7 @@ def display_sidebar_ads():
     """
     st.sidebar.markdown(ad_html, unsafe_allow_html=True)
     
+    # [광고 2] 팁 영역 (YES24 도서 추천)
     tip_html = f"""
     <div style="margin-top: 10px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 8px; border-left: 3px solid #e4c1b2;">
         <div style="color: #e4c1b2; font-weight: bold; font-size: 0.9em; margin-bottom: 5px;">{T("tip_title")}</div>
@@ -325,17 +326,23 @@ def display_sidebar_ads():
     st.sidebar.markdown(tip_html, unsafe_allow_html=True)
 
 def display_bottom_ad():
-    """화면 하단 배너 광고"""
+    """화면 하단 배너 광고 (동적 타겟팅 적용 - 하단 고정 컴팩트 버전)"""
+    
+    # 현재 선택된 학년 가져오기
     current_grade = st.session_state.get('grade', '')
     
+    # 학년별 검색 키워드 매핑 (쿠팡 검색용)
     search_keyword = "수학문제집"
     if "Elementary" in current_grade or "초등" in current_grade: search_keyword = "초등수학문제집"
     elif "Middle" in current_grade or "중학" in current_grade: search_keyword = "중등수학문제집"
     elif "High" in current_grade or "고등" in current_grade: search_keyword = "고등수학문제집"
     elif "University" in current_grade: search_keyword = "대학수학 전공서적"
 
+    # 파트너스 링크 (여기에 선생님의 쿠팡 파트너스 트래킹 링크를 넣으면 됩니다)
+    # 현재는 예시로 검색 결과 페이지 링크를 넣었습니다.
     partners_link = f"https://www.coupang.com/np/search?component=&q={search_keyword}&channel=user"
     
+    # Premium Style Banner - Fixed Bottom, Compact Version, No Disclaimer
     ad_html = f"""
     <div style="
         position: fixed;
@@ -383,7 +390,7 @@ def display_bottom_ad():
     st.markdown(ad_html, unsafe_allow_html=True)
 
 # =========================================================================
-# 3. Utilities & Logic
+# 3. Utilities & Logic (원본 기능 100% 복구)
 # =========================================================================
 
 def load_reference_materials():
@@ -1337,9 +1344,9 @@ def apply_custom_css():
             color: {primary} !important;
         }}
         /* Answer & Solution Border Fix */
-        [data-testid="stVerticalBlockBorderWrapper"] {
+        [data-testid="stVerticalBlockBorderWrapper"] {{
              border-color: {primary} !important;
-        }
+        }}
         </style>
     """, unsafe_allow_html=True)
 
@@ -1479,11 +1486,10 @@ def main_app_interface():
                      st.download_button(T("download_pdf"), data=bytes(pdf_bytes), file_name=f"{title}.pdf", mime="application/pdf", use_container_width=True)
                 
                 # [결과 하단 광고]
-                st.success("팁: 이 문제가 마음에 드셨나요? 더 많은 자료는 아래 링크를 확인해보세요!")
                 st.markdown("""
                 <a href="https://www.yes24.com" target="_blank">
                     <div style="background-color: #f0f2f6; padding: 15px; border-radius: 8px; text-align: center; color: #333;">
-                        📚 <b>추천 문제집 보러가기 (YES24)</b>
+                        📚 <b>추천 문제집 보러가기</b>
                     </div>
                 </a>
                 """, unsafe_allow_html=True)
