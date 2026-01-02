@@ -1,4 +1,4 @@
-```python
+
 import streamlit as st
 from PIL import Image
 import io
@@ -1352,3 +1352,4 @@ def main():
     main_app_interface()
 if __name__ == "__main__":
     main()
+
