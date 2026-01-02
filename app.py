@@ -139,50 +139,18 @@ UI_TEXT = {
         "delete": "삭제",
         "create_workbook": "📚 워크북 생성",
         "no_history": "기록이 없습니다.",
+        # [수정] 팁 영역: YES24 관련 내용으로 변경
         "tip_title": "📚 선생님을 위한 추천 도서",
         "tip_content": "수업 퀄리티를 높여줄 필독서와 베스트셀러 문제집을 확인해보세요!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>베스트셀러 보러가기</a>",
         "ad_title": "🔥 선생님 필수템",
         "ad_content": "수학 교구 모음전",
         "ad_click": "(클릭하여 보기)",
+        # 하단 광고 텍스트 (동적으로 변경됨)
         "bottom_ad_prefix": "🚀 ",
         "bottom_ad_suffix": " 수학 성적 수직 상승의 비밀?",
-        "bottom_ad_desc": "AI가 만든 문제로 부족하다면? <b>가장 많이 팔리는 문제집</b>을 확인해보세요.",
-        "bottom_ad_btn": "🏆 최저가 보러가기",
-        
-        # Dialogs
-        "dialog_opt_title": "📝 옵션",
-        "dialog_guide_title": "📖 가이드",
-        "dialog_mat_title": "📚 자료함",
-        "dialog_style_title": "🖼️ 스타일",
-        "dialog_theme_title": "🎨 테마",
-        "dialog_data_title": "🗑️ 데이터 관리",
-        "opt_caption": "문제 생성 설정",
-        "opt_grade": "학년",
-        "opt_subject": "과목",
-        "opt_diff": "난이도",
-        "opt_type": "문제 유형",
-        "opt_save": "저장 및 닫기",
-        "guide_md": """### 사용 방법
-1. **🔑 API**: Google Gemini API 키를 입력하세요.
-2. **📝 옵션**: 학년과 난이도를 설정하세요.
-3. **📸 업로드**: 문제 이미지를 드래그 앤 드롭하세요.
-4. **✨ 생성**: 버튼을 클릭하세요!""",
-        "mat_caption": "참고 자료 업로드 (PDF/TXT)",
-        "mat_loaded": "로딩됨: {len} 자",
-        "mat_upload": "파일 업로드",
-        "mat_success": "자료가 추가되었습니다!",
-        "style_caption": "스타일 참조 이미지 업로드",
-        "style_label": "참조 이미지",
-        "style_success": "스타일이 적용되었습니다!",
-        "style_current": "현재 스타일",
-        "theme_caption": "색상 사용자 정의",
-        "theme_primary": "기본 색상 (Primary)",
-        "theme_bg": "배경 색상",
-        "theme_text": "텍스트 색상",
-        "theme_bg_img": "배경 이미지",
-        "theme_apply": "테마 적용",
-        "data_warn": "이 작업은 되돌릴 수 없습니다.",
-        "data_clear": "모든 기록 삭제"
+        # [Text Changed]
+        "bottom_ad_desc": "이 문제로 부족하다면? <b>지금 가장 많이 팔리는 문제집</b>을 확인해보세요.",
+        "bottom_ad_btn": "🏆 최저가 보러가기"
     },
     "English": {
         "guide_btn": "📖 Guide",
@@ -214,6 +182,7 @@ UI_TEXT = {
         "delete": "Delete",
         "create_workbook": "📚 Create Workbook",
         "no_history": "No history yet.",
+        # [Edited] Tip Section: Changed to Recommended Books
         "tip_title": "📚 Recommended Books",
         "tip_content": "Check out the best-selling textbooks and must-read books for teachers!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>Go to YES24</a>",
         "ad_title": "🔥 Must-Have Items",
@@ -222,42 +191,7 @@ UI_TEXT = {
         "bottom_ad_prefix": "🚀 ",
         "bottom_ad_suffix": " Math Grades Booster!",
         "bottom_ad_desc": "Need more than AI problems? Check out the <b>Best Selling Workbooks</b>.",
-        "bottom_ad_btn": "🏆 View Best Prices",
-        
-        # Dialogs
-        "dialog_opt_title": "📝 Options",
-        "dialog_guide_title": "📖 User Guide",
-        "dialog_mat_title": "📚 Materials",
-        "dialog_style_title": "🖼️ Style Reference",
-        "dialog_theme_title": "🎨 Theme Settings",
-        "dialog_data_title": "🗑️ Data Management",
-        "opt_caption": "Customize problem generation",
-        "opt_grade": "Grade",
-        "opt_subject": "Subject",
-        "opt_diff": "Diff",
-        "opt_type": "Type",
-        "opt_save": "Save & Close",
-        "guide_md": """### How to Use
-1. **🔑 API**: Enter Google Gemini API Key.
-2. **📝 Options**: Set grade & difficulty.
-3. **📸 Upload**: Drag & drop problem image.
-4. **✨ Generate**: Click button!""",
-        "mat_caption": "Upload reference materials (PDF/TXT)",
-        "mat_loaded": "Loaded: {len} chars",
-        "mat_upload": "Upload Files",
-        "mat_success": "Materials Added!",
-        "style_caption": "Upload an image to mimic its visual style",
-        "style_label": "Reference Image",
-        "style_success": "Style Applied!",
-        "style_current": "Current Style",
-        "theme_caption": "Customize colors",
-        "theme_primary": "Primary",
-        "theme_bg": "Background",
-        "theme_text": "Text",
-        "theme_bg_img": "Background Image",
-        "theme_apply": "Apply Theme",
-        "data_warn": "This action cannot be undone.",
-        "data_clear": "Clear All History"
+        "bottom_ad_btn": "🏆 View Best Prices"
     }
 }
 
@@ -328,8 +262,7 @@ def display_sidebar_ads():
     st.sidebar.markdown(tip_html, unsafe_allow_html=True)
 
 def display_bottom_ad():
-    """화면 하단 배너 광고 (동적 타겟팅 적용 - 컴팩트 버전)"""
-    st.markdown("---")
+    """화면 하단 배너 광고 (동적 타겟팅 적용 - 하단 고정 컴팩트 버전)"""
     
     # 현재 선택된 학년 가져오기
     current_grade = st.session_state.get('grade', '')
@@ -342,35 +275,44 @@ def display_bottom_ad():
     elif "University" in current_grade: search_keyword = "대학수학 전공서적"
 
     # 파트너스 링크 (여기에 선생님의 쿠팡 파트너스 트래킹 링크를 넣으면 됩니다)
-    # 현재는 예시로 검색 결과 페이지 링크를 넣었습니다.
     partners_link = f"https://www.coupang.com/np/search?component=&q={search_keyword}&channel=user"
     
-    # Premium Style Banner - Compact Version
+    # Premium Style Banner - Fixed Bottom, Compact Version, No Disclaimer
     ad_html = f"""
     <div style="
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999;
+        width: 80%;
+        max-width: 600px;
         background: linear-gradient(135deg, #2F2E35 0%, #1A1C24 100%);
         border: 1px solid #e4c1b2;
-        border-radius: 15px;
-        padding: 15px;
+        border-radius: 30px;
+        padding: 10px 20px;
         text-align: center;
-        margin-top: 20px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
     ">
-        <h3 style="color: #e4c1b2; margin-bottom: 5px; font-size: 1.3rem;">
+        <div style="color: #e4c1b2; font-size: 1.0rem; font-weight: bold;">
             {T("bottom_ad_prefix")}{current_grade}{T("bottom_ad_suffix")}
-        </h3>
-        <p style="color: #e0e0e0; margin-bottom: 15px; font-size: 1.0rem;">
+        </div>
+        <div style="color: #e0e0e0; font-size: 0.9rem;">
             {T("bottom_ad_desc")}
-        </p>
-        <a href="{partners_link}" target="_blank" style="text-decoration: none;">
+        </div>
+        <a href="{partners_link}" target="_blank" style="text-decoration: none; margin-top: 5px;">
             <div style="
                 background-color: #008CFA; /* Coupang Blue */
                 color: white;
-                padding: 10px 30px;
-                border-radius: 30px;
+                padding: 8px 25px;
+                border-radius: 20px;
                 font-weight: 800;
-                font-size: 1.0rem;
+                font-size: 0.9rem;
                 display: inline-block;
                 transition: all 0.2s ease;
                 box-shadow: 0 4px 15px rgba(0, 140, 250, 0.3);
@@ -1318,7 +1260,7 @@ def apply_custom_css():
 
         /* File Uploader Button Styling */
         [data-testid="stFileUploader"] button {{
-            background-color: transparent !important;
+            background-color: #2F2E35 !important; /* Darker background */
             color: {primary} !important;
             border: 1px solid {primary} !important;
             border-radius: 8px !important;
