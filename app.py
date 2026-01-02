@@ -1,4 +1,3 @@
-
 import streamlit as st
 from PIL import Image
 import io
@@ -199,10 +198,13 @@ def display_sidebar_ads():
         <p style="color: #e4c1b2; font-size: 0.9em; margin-bottom: 5px;">{T("ad_title")}</p>
         <a href="https://www.coupang.com/" target="_blank" style="text-decoration: none;">
             <div style="background-color: #eee; color: #333; padding: 15px; border-radius: 5px; font-weight: bold; font-size: 0.9em;">
-                {T("ad_content")}<br>
+                {T("ad_content")}<br>오늘의 꿀템은 뭘까요?<br>
                 <span style="font-size: 0.8em; color: #666;">{T("ad_click")}</span>
             </div>
         </a>
+        <p style="color: #aaaaaa; font-size: 0.65em; margin-top: 8px; opacity: 0.8;">
+            이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+        </p>
     </div>
     """
     st.sidebar.markdown(ad_html, unsafe_allow_html=True)
@@ -234,34 +236,34 @@ def display_bottom_ad():
         left: 50%;
         transform: translateX(-50%);
         z-index: 999;
-        width: 60%;
-        max-width: 450px;
+        width: 90%;
+        max-width: 810px;
         background: linear-gradient(135deg, #2F2E35 0%, #1A1C24 100%);
         border: 1px solid #e4c1b2;
         border-radius: 20px;
-        padding: 10px 15px;
+        padding: 12px 18px;
         text-align: center;
         box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 3px;
+        gap: 5px;
     ">
-        <div style="color: #e4c1b2; font-size: 0.9rem; font-weight: bold;">
+        <div style="color: #e4c1b2; font-size: 1.05rem; font-weight: bold;">
             {T("bottom_ad_prefix")}{current_grade}{T("bottom_ad_suffix")}
         </div>
-        <div style="color: #e0e0e0; font-size: 0.8rem; margin-bottom: 5px;">
+        <div style="color: #e0e0e0; font-size: 0.9rem; margin-bottom: 6px;">
             {T("bottom_ad_desc")}
         </div>
         <a href="{partners_link}" target="_blank" style="text-decoration: none;">
             <div style="
                 background-color: #008CFA;
                 color: white;
-                padding: 6px 20px;
+                padding: 8px 24px;
                 border-radius: 15px;
                 font-weight: 800;
-                font-size: 0.8rem;
+                font-size: 0.9rem;
                 display: inline-block;
                 transition: all 0.2s ease;
                 box-shadow: 0 2px 10px rgba(0, 140, 250, 0.3);
@@ -269,6 +271,9 @@ def display_bottom_ad():
                 {T("bottom_ad_btn")}
             </div>
         </a>
+        <p style="color: #bbbbbb; font-size: 0.65rem; margin-top: 6px; opacity: 0.8;">
+            이 포스팅은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.
+        </p>
     </div>
     """
     st.markdown(ad_html, unsafe_allow_html=True)
@@ -357,8 +362,8 @@ def normalize_latex_text(text):
     text = re.sub(r'\\begin\{cases\}', r'\{', text)
     text = re.sub(r'\\end\{cases\}', r'\}', text)
     text = text.replace('$$', '$')
-    text = text.replace('\$$ ', '\( ').replace('\ $$', ' \)')
-    text = text.replace('\$$ ', '\( ').replace('\ $$', ' \)')
+    text = text.replace('\\[', '$').replace('\\]', '$')
+    text = text.replace('\\(', '$').replace('\\)', '$')
     return text
 def clean_python_code(code):
     if not code:
@@ -378,7 +383,7 @@ def split_long_latex(text, limit=75):
     if not isinstance(text, str):
         text = str(text)
     def replacer(match):
-        content = match.group(0)
+        content_content = match.group(0)
         inner = content[1:-1].strip()
         if r'\begin{' in inner:
             return content
@@ -389,24 +394,24 @@ def split_long_latex(text, limit=75):
             new_inner = parts[0].strip()
             for part in parts[1:]:
                 new_inner += "\n\n=" + part.strip()
-            return f"$$ {new_inner} $$"
+            return f"${new_inner}$"
         elif "=" in inner:
             parts = inner.split("=")
             new_inner = parts[0].strip()
             for part in parts[1:]:
                 new_inner += "\n\n=" + part.strip()
-            return f"$$ {new_inner} $$"
+            return f"${new_inner}$"
         for op in [" + ", " - "]:
             if op in inner:
                 parts = inner.split(op)
                 new_inner = parts[0].strip()
                 for part in parts[1:]:
                     new_inner += "\n\n" + op.strip() + part.strip()
-                return f"$$ {new_inner} $$"
+                return f"${new_inner}$"
         return content
     processed = re.sub(r'\$.*?\$', replacer, text, flags=re.DOTALL)
-    processed = re.sub(r'\$$ \s+', ' $$', processed)
-    processed = re.sub(r'\s+\$$ ', ' $$', processed)
+    processed = re.sub(r'\$\s+', '$', processed)
+    processed = re.sub(r'\s+\$', '$', processed)
     return processed
 def get_base64_of_bin_file(bin_file):
     data = bin_file.read()
@@ -425,7 +430,6 @@ def parse_gemini_json_response(text):
                 if isinstance(val, (list, tuple)):
                     val = "\n\n".join(map(str, val))
                 elif isinstance(val, dict):
-                    # 강화된 처리: problem이 dict 형태로 들어온 경우 'question_text'나 첫 번째 값 추출
                     if key == "problem" and 'question_text' in val:
                         val = val['question_text']
                     elif key == "problem" and val:
@@ -463,14 +467,13 @@ def parse_gemini_json_response(text):
                     extracted_data[k] = clean_python_code(content)
                 else:
                     extracted_data[k] = normalize_latex_text(content)
-        # 백업: problem이 비어있고 'question_text'가 있으면 강제 추출
         if not extracted_data["problem"] and 'question_text' in text:
             qmatch = re.search(r'"question_text"\s*:\s*"(.*?)"', text, re.DOTALL)
             if qmatch:
                 extracted_data["problem"] = normalize_latex_text(qmatch.group(1))
         if len(extracted_data["problem"]) > 10:
             return extracted_data
-        return {"problem": text, "concept": "Parsing Error", "achievement_standard": "", "hint": "", "answer": "", "solution": "", "drawing_code": ""}
+        return {"problem": text,"concept": "Parsing Error", "achievement_standard": "", "hint": "", "answer": "", "solution": "", "drawing_code": ""}
 # =========================================================================
 # 4. PDF Generator
 # =========================================================================
@@ -1275,7 +1278,6 @@ def main_app_interface():
                 with st.container():
                     st.markdown(f'<div class="result-card"><div class="result-header">{T("result_card")}</div>', unsafe_allow_html=True)
                     with st.container(border=True):
-                        # 안전 장치 추가: str()으로 강제 문자열 변환
                         st.markdown(f"**Q.** {normalize_latex_text(str(data.get('problem', '')))}")
                     st.markdown('</div>', unsafe_allow_html=True)
                 d_code = data.get('drawing_code')
@@ -1337,7 +1339,6 @@ def main_app_interface():
                     with st.expander(f"{item['time']} - {item['grade']} ({item['difficulty']})"):
                         data = item['data']
                         st.markdown(f"**Concept:** {data.get('concept')}")
-                        # 히스토리에서도 안전 장치 추가
                         st.markdown(f"**Problem:** {normalize_latex_text(str(data.get('problem')))}")
                         st.markdown(f"**Answer:** {data.get('answer')}")
                         st.markdown(f"**Solution:** {normalize_latex_text(data.get('solution'))}")
@@ -1352,4 +1353,3 @@ def main():
     main_app_interface()
 if __name__ == "__main__":
     main()
-
