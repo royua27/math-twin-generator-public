@@ -722,7 +722,8 @@ class GeminiClient:
     def get_working_model(api_key):
         key = str(api_key).strip()
         url = f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
-        priorities = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-001', 'gemini-2.0-flash-exp', 'gemini-1.5-pro']
+        # Updated priorities: gemini-2.5-flash first as requested
+        priorities = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
         session = requests.Session()
         adapter = HTTPAdapter(max_retries=Retry(connect=3, backoff_factor=0.5))
         session.mount('https://', adapter)
@@ -756,7 +757,7 @@ class GeminiClient:
             m = active_model_name
             if not m:
                 cached_m = st.session_state.get('valid_model_name')
-                m = cached_m if cached_m else 'gemini-1.5-flash'
+                m = cached_m if cached_m else 'gemini-2.5-flash'
                 st.session_state['valid_model_name'] = m
         
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={api_key}"
@@ -773,7 +774,10 @@ class GeminiClient:
                 return "⚠️ Quota Exceeded", m
             elif res.status_code == 404:
                 st.session_state['valid_model_name'] = None 
-                if retry < 2: return GeminiClient.call_api(api_key, payload, None, retry+1)
+                if retry < 1: 
+                    # Try to find a valid model again
+                    GeminiClient.test_api_connection(api_key)
+                    return GeminiClient.call_api(api_key, payload, None, retry+1)
                 return "⚠️ Model Not Found", m
             return f"Error {res.status_code}: {res.text}", m
         except Exception as e:
@@ -1184,9 +1188,10 @@ def main_app_interface():
                  ok, msg = GeminiClient.test_api_connection(api_key)
                  if ok: st.success(T("api_success"))
                  else: st.error(msg)
-        else:
-            # [Change] Removed the success message as requested
-            pass 
+        
+        # Check API connection automatically if key exists but model not set
+        if api_key and not st.session_state.get('valid_model_name'):
+             ok, msg = GeminiClient.test_api_connection(api_key)
 
         if st.button(T("options_btn"), use_container_width=True): dialog_options()
         if st.button(T("materials_btn"), use_container_width=True): dialog_materials()
