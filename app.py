@@ -74,9 +74,12 @@ def setup_fonts():
 
     if os.path.exists(FONT_PATH):
         try:
+            # 폰트 매니저에 폰트 추가
             fm.fontManager.addfont(FONT_PATH)
-            font_prop = fm.FontProperties(fname=FONT_PATH)
-            plt.rcParams['font.family'] = font_prop.get_name()
+            
+            # [Fix] 전역 폰트 설정 (한글 + 수식)
+            # NanumGothic을 기본으로 하되, 수식은 cm(Computer Modern) 사용
+            plt.rcParams['font.family'] = ['NanumGothic', 'DejaVu Sans'] # Fallback
             plt.rcParams['mathtext.fontset'] = 'cm' 
             plt.rcParams['axes.unicode_minus'] = False
             font_ready = True
@@ -125,8 +128,8 @@ UI_TEXT = {
         "original_card": "📸 원본 문제",
         "result_card": "✨ 생성 결과",
         "upload_label": "업로드",
-        "generate_btn": "✨ 생성하기",
-        "generating_status": "생성 중...",
+        "generate_btn": "✨ 변형 문제 만들기",
+        "generating_status": "변형 문제 만드는 중...",
         "answer_solution": "정답 및 해설",
         "download_pdf": "📥 PDF 다운로드",
         "history_tab": "📜 히스토리",
@@ -139,18 +142,49 @@ UI_TEXT = {
         "delete": "삭제",
         "create_workbook": "📚 워크북 생성",
         "no_history": "기록이 없습니다.",
-        # [수정] 팁 영역: YES24 관련 내용으로 변경
+        # Tip Section
         "tip_title": "📚 선생님을 위한 추천 도서",
         "tip_content": "수업 퀄리티를 높여줄 필독서와 베스트셀러 문제집을 확인해보세요!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>베스트셀러 보러가기</a>",
         "ad_title": "🔥 선생님 필수템",
         "ad_content": "수학 교구 모음전",
         "ad_click": "(클릭하여 보기)",
-        # 하단 광고 텍스트 (동적으로 변경됨)
+        # Bottom Ad
         "bottom_ad_prefix": "🚀 ",
         "bottom_ad_suffix": " 수학 성적 수직 상승의 비밀?",
-        # [Text Changed]
         "bottom_ad_desc": "이 문제로 부족하다면? <b>지금 가장 많이 팔리는 문제집</b>을 확인해보세요.",
-        "bottom_ad_btn": "🏆 최저가 보러가기"
+        "bottom_ad_btn": "🏆 최저가 보러가기",
+        # Dialogs Translations
+        "opt_caption": "문제 생성 설정",
+        "opt_grade": "학년",
+        "opt_subject": "과목",
+        "opt_diff": "난이도",
+        "opt_type": "문제 유형",
+        "opt_save": "저장 및 닫기",
+        "guide_md": """### 사용 방법
+1. **🔑 API**: Google Gemini API 키를 입력하세요.
+2. **📝 옵션**: 학년과 난이도를 설정하세요.
+3. **📸 업로드**: 문제 이미지를 드래그 앤 드롭하세요.
+4. **✨ 생성**: '변형 문제 만들기' 버튼을 클릭하세요!""",
+        "mat_caption": "참고 자료 업로드 (PDF/TXT)",
+        "mat_loaded": "로딩됨: {len} 자",
+        "mat_upload": "파일 업로드",
+        "mat_success": "자료가 추가되었습니다!",
+        "style_caption": "스타일 참조 이미지 업로드",
+        "style_label": "참조 이미지",
+        "style_success": "스타일이 적용되었습니다!",
+        "style_current": "현재 스타일",
+        "theme_caption": "색상 사용자 정의",
+        "theme_primary": "기본 색상 (Primary)",
+        "theme_bg": "배경 색상",
+        "theme_text": "텍스트 색상",
+        "theme_bg_img": "배경 이미지",
+        "theme_apply": "테마 적용",
+        "data_warn": "이 작업은 되돌릴 수 없습니다.",
+        "data_clear": "모든 기록 삭제",
+        # Export Modes
+        "export_mode_integrated": "통합본 (문제+해설)",
+        "export_mode_problem": "문제만",
+        "export_mode_solution": "해설만"
     },
     "English": {
         "guide_btn": "📖 Guide",
@@ -168,8 +202,8 @@ UI_TEXT = {
         "original_card": "📸 Original",
         "result_card": "✨ Result",
         "upload_label": "Upload",
-        "generate_btn": "✨ Generate",
-        "generating_status": "Generating...",
+        "generate_btn": "✨ Generate Twin Problem",
+        "generating_status": "Generating Twin Problem...",
         "answer_solution": "Answer & Solution",
         "download_pdf": "📥 Download PDF",
         "history_tab": "📜 History",
@@ -182,7 +216,7 @@ UI_TEXT = {
         "delete": "Delete",
         "create_workbook": "📚 Create Workbook",
         "no_history": "No history yet.",
-        # [Edited] Tip Section: Changed to Recommended Books
+        # Tip Section
         "tip_title": "📚 Recommended Books",
         "tip_content": "Check out the best-selling textbooks and must-read books for teachers!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>Go to YES24</a>",
         "ad_title": "🔥 Must-Have Items",
@@ -191,7 +225,39 @@ UI_TEXT = {
         "bottom_ad_prefix": "🚀 ",
         "bottom_ad_suffix": " Math Grades Booster!",
         "bottom_ad_desc": "Need more than AI problems? Check out the <b>Best Selling Workbooks</b>.",
-        "bottom_ad_btn": "🏆 View Best Prices"
+        "bottom_ad_btn": "🏆 View Best Prices",
+        # Dialogs Translations
+        "opt_caption": "Customize problem generation",
+        "opt_grade": "Grade",
+        "opt_subject": "Subject",
+        "opt_diff": "Diff",
+        "opt_type": "Type",
+        "opt_save": "Save & Close",
+        "guide_md": """### How to Use
+1. **🔑 API**: Enter Google Gemini API Key.
+2. **📝 Options**: Set grade & difficulty.
+3. **📸 Upload**: Drag & drop problem image.
+4. **✨ Generate**: Click the button!""",
+        "mat_caption": "Upload reference materials (PDF/TXT)",
+        "mat_loaded": "Loaded: {len} chars",
+        "mat_upload": "Upload Files",
+        "mat_success": "Materials Added!",
+        "style_caption": "Upload an image to mimic its visual style",
+        "style_label": "Reference Image",
+        "style_success": "Style Applied!",
+        "style_current": "Current Style",
+        "theme_caption": "Customize colors",
+        "theme_primary": "Primary",
+        "theme_bg": "Background",
+        "theme_text": "Text",
+        "theme_bg_img": "Background Image",
+        "theme_apply": "Apply Theme",
+        "data_warn": "This action cannot be undone.",
+        "data_clear": "Clear All History",
+        # Export Modes
+        "export_mode_integrated": "Integrated",
+        "export_mode_problem": "Problem Only",
+        "export_mode_solution": "Solution Only"
     }
 }
 
@@ -208,7 +274,8 @@ def get_option_label(option):
             "University Math": "대학수학",
             "Maintain": "유지", "Easier": "쉽게", "Harder": "어렵게",
             "Any": "랜덤/지정안함", "Multiple Choice": "객관식", "Essay": "주관식/서술형",
-            "Calculus": "미적분학", "Linear Algebra": "선형대수학", "Statistics": "통계학", "Topology": "위상수학", "Number Theory": "정수론"
+            "Calculus": "미적분학", "Linear Algebra": "선형대수학", "Statistics": "통계학", "Topology": "위상수학", "Number Theory": "정수론",
+            "Integrated": "통합본 (문제+해설)", "Problem Only": "문제만", "Solution Only": "해설만"
         }
         return K_MAP.get(option, option)
     return option
@@ -219,10 +286,8 @@ def get_option_label(option):
 
 def display_sidebar_ads():
     """사이드바 광고 배너 영역"""
-    # [Design Fix] Reduced spacing for sidebar elements via markdown CSS injection
     st.sidebar.markdown("""
         <style>
-        /* Reduce spacing in sidebar - Adjusted from -15px to -5px */
         [data-testid="stSidebar"] .stMarkdown, [data-testid="stSidebar"] .stButton {
             margin-bottom: -5px !important;
         }
@@ -236,7 +301,6 @@ def display_sidebar_ads():
     st.sidebar.markdown("---")
     st.sidebar.header(T("sidebar_header"))
     
-    # [광고 1] 쿠팡/YES24 파트너스 링크 (밝은 배경)
     ad_html = f"""
     <div style="text-align: center; margin-bottom: 15px; background-color: #2F2E35; padding: 10px; border-radius: 10px; border: 1px solid #403e41;">
         <p style="color: #e4c1b2; font-size: 0.9em; margin-bottom: 5px;">{T("ad_title")}</p>
@@ -250,7 +314,6 @@ def display_sidebar_ads():
     """
     st.sidebar.markdown(ad_html, unsafe_allow_html=True)
     
-    # [광고 2] 팁 영역 (YES24 도서 추천)
     tip_html = f"""
     <div style="margin-top: 10px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 8px; border-left: 3px solid #e4c1b2;">
         <div style="color: #e4c1b2; font-weight: bold; font-size: 0.9em; margin-bottom: 5px;">{T("tip_title")}</div>
@@ -262,22 +325,17 @@ def display_sidebar_ads():
     st.sidebar.markdown(tip_html, unsafe_allow_html=True)
 
 def display_bottom_ad():
-    """화면 하단 배너 광고 (동적 타겟팅 적용 - 하단 고정 컴팩트 버전)"""
-    
-    # 현재 선택된 학년 가져오기
+    """화면 하단 배너 광고"""
     current_grade = st.session_state.get('grade', '')
     
-    # 학년별 검색 키워드 매핑 (쿠팡 검색용)
     search_keyword = "수학문제집"
     if "Elementary" in current_grade or "초등" in current_grade: search_keyword = "초등수학문제집"
     elif "Middle" in current_grade or "중학" in current_grade: search_keyword = "중등수학문제집"
     elif "High" in current_grade or "고등" in current_grade: search_keyword = "고등수학문제집"
     elif "University" in current_grade: search_keyword = "대학수학 전공서적"
 
-    # 파트너스 링크 (여기에 선생님의 쿠팡 파트너스 트래킹 링크를 넣으면 됩니다)
     partners_link = f"https://www.coupang.com/np/search?component=&q={search_keyword}&channel=user"
     
-    # Premium Style Banner - Fixed Bottom, Compact Version, No Disclaimer
     ad_html = f"""
     <div style="
         position: fixed;
@@ -325,7 +383,7 @@ def display_bottom_ad():
     st.markdown(ad_html, unsafe_allow_html=True)
 
 # =========================================================================
-# 3. Utilities & Logic (원본 기능 100% 복구)
+# 3. Utilities & Logic
 # =========================================================================
 
 def load_reference_materials():
@@ -399,48 +457,19 @@ def normalize_latex_text(text):
     if text is None: return ""
     text = str(text)
     
-    # cases 환경 단순화
+    # [Fix] Pre-process to improve Matplotlib MathText compatibility
+    # Replace \text{} with \mathrm{} as \text is not fully supported in matplotlib mathtext
+    text = re.sub(r'\\text\{([^}]*)\}', r'\\mathrm{\1}', text)
+    
+    # Simplify environment blocks
     text = re.sub(r'\\begin\{cases\}', r'\{', text)
     text = re.sub(r'\\end\{cases\}', r'\}', text)
     
-    math_placeholders = []
-    def protect(match):
-        math_placeholders.append(match.group(0))
-        return f"__MATH_PROTECTED_{len(math_placeholders)-1}__"
-    
-    text = re.sub(r'\$\$.*?\$\$', protect, text, flags=re.DOTALL)
-    text = re.sub(r'\$.*?\$', protect, text, flags=re.DOTALL)
-
-    # Remove complex commands to prevent breakage
-    commands = [
-        r'\\ge', r'\\le', r'\\neq', r'\\ne', r'\\approx', r'\\pm', 
-        r'\\times', r'\\div', r'\\cdot', r'\\infty', 
-        r'\\alpha', r'\\beta', r'\\gamma', r'\\theta', r'\\pi', r'\\to',
-    ]
-    cmd_pattern = '|'.join(commands)
-    def wrap_cmd(match): return f"${match.group(0)}$"
-    text = re.sub(f"({cmd_pattern})", wrap_cmd, text)
-
-    text = re.sub(r'therefore(?=[a-zA-Z])', r'\\therefore ', text)
-    replacements = {
-        r';lim\b': r'\\lim', r';to\b': r'\\to', r';frac\b': r'\\frac',
-        r'\btherefore\b': r'\\therefore', r'\bbecause\b': r'\\because',
-        r'\bquad\b': r'\\quad', r'\bqquad\b': r'\\qquad',
-        r'\bcdots\b': r'\\cdots', r'\bvdots\b': r'\\vdots',
-        r'\bddots\b': r'\\ddots', r'\btext\b': r'\\text',
-        r'\bgeq\b': r'$\\ge$', r'\bleq\b': r'$\\le$',
-        r'\bge\b': r'$\\ge$', r'\ble\b': r'$\\le$'
-    }
-    for p, r in replacements.items(): text = re.sub(p, r, text)
-    text = re.sub(r'\\text\((.*?)\)', r'\\text{\1}', text)
-
-    def restore(match): return math_placeholders[int(match.group(1))]
-    for _ in range(3):
-        if "__MATH_PROTECTED_" not in text: break
-        text = re.sub(r'__MATH_PROTECTED_(\d+)__', restore, text)
-    
+    # Standardize delimiters
     text = text.replace('$$', '$')
-    text = re.sub(r'\$\s*\$', '', text) 
+    text = text.replace('\\[', '$').replace('\\]', '$')
+    text = text.replace('\\(', '$').replace('\\)', '$')
+    
     return text
 
 def clean_python_code(code):
@@ -513,8 +542,6 @@ def parse_gemini_json_response(text):
                 if key == "drawing_code":
                     data[key] = clean_python_code(data[key])
                 else:
-                    data[key] = data[key].replace('\\[', '$$').replace('\\]', '$$')
-                    data[key] = data[key].replace('\\(', '$').replace('\\)', '$')
                     data[key] = normalize_latex_text(data[key])
                     if key in ['solution', 'problem']:
                         data[key] = split_long_latex(data[key], limit=75)
@@ -535,7 +562,6 @@ def parse_gemini_json_response(text):
                 if k == "drawing_code":
                     extracted_data[k] = clean_python_code(content)
                 else:
-                    content = content.replace('\\[', '$$').replace('\\]', '$$').replace('\\(', '$').replace('\\)', '$')
                     extracted_data[k] = normalize_latex_text(content)
         if len(extracted_data["problem"]) > 10: return extracted_data
         return {"problem": text, "concept": "Parsing Error", "achievement_standard": "", "hint": "", "answer": "", "solution": "", "drawing_code": ""}
@@ -549,16 +575,22 @@ class PDFGenerator:
     def render_text_to_image(text, width_inch=8.0):
         try:
             if not text or not text.strip(): return None
+            
+            # [Fix] Matplotlib configuration for better font fallback
+            plt.rcParams['font.family'] = ['NanumGothic', 'DejaVu Sans']
+            plt.rcParams['mathtext.fontset'] = 'cm'
+            plt.rcParams['axes.unicode_minus'] = False
+            
             plt.clf(); plt.close('all')
-            prop = fm.FontProperties(fname=FONT_PATH, size=14) if os.path.exists(FONT_PATH) else None
             
+            # Additional normalization for rendering
             text = normalize_latex_text(text)
-            text = text.replace('$$', '$')
-            text = re.sub(r'([가-힣])(\$)(?=[^.,:;?!])', r'\1 \2', text)
-            text = re.sub(r'(\$)([가-힣])', r'\1 \2', text)
             
+            # Protect math blocks from being wrapped inside
             math_matches = []
-            def protect(m): math_matches.append(m.group(0)); return f"__M_{len(math_matches)-1}__"
+            def protect(m): 
+                math_matches.append(m.group(0))
+                return f"__M_{len(math_matches)-1}__"
             protected_text = re.sub(r'\$.*?\$', protect, text, flags=re.DOTALL)
             
             wrapped_lines = []
@@ -566,31 +598,49 @@ class PDFGenerator:
                 if not line.strip(): 
                     wrapped_lines.append("")
                     continue
+                # Wrap text but respect protection placeholders
                 lines = textwrap.wrap(line, width=50, break_long_words=False, break_on_hyphens=False)
                 wrapped_lines.extend(lines)
             
             final_lines = []
             for line in wrapped_lines:
+                # Restore math blocks
                 restored = re.sub(r'__M_(\d+)__', lambda m: math_matches[int(m.group(1))], line)
                 final_lines.append(restored)
             
             wrapped_text = '\n'.join(final_lines)
-            height = max(1.0, len(final_lines) * 0.7) + 0.5
+            
+            # Calculate dynamic height based on line count
+            height = max(1.0, len(final_lines) * 0.6) + 0.5
             
             fig = plt.figure(figsize=(width_inch, height))
             fig.patch.set_facecolor('white')
+            
             try:
-                plt.text(0.01, 0.98, wrapped_text, fontproperties=prop, va='top', ha='left')
+                # Render text
+                plt.text(0.01, 0.98, wrapped_text, va='top', ha='left', fontsize=12)
                 plt.axis('off')
+                
                 buf = io.BytesIO()
-                plt.savefig(buf, format='png', bbox_inches='tight', dpi=600, pad_inches=0.1)
+                plt.savefig(buf, format='png', bbox_inches='tight', dpi=300, pad_inches=0.1)
                 buf.seek(0)
                 plt.close()
                 return buf
-            except:
-                plt.clf(); plt.close()
-                return None
-        except: return None
+            except Exception as e:
+                # Fallback: remove math symbols if rendering fails completely
+                # print(f"Rendering failed: {e}")
+                plt.clf()
+                clean_text = text.replace('$', '')
+                plt.text(0.01, 0.98, clean_text, va='top', ha='left', fontsize=12)
+                plt.axis('off')
+                buf = io.BytesIO()
+                plt.savefig(buf, format='png', bbox_inches='tight', dpi=300, pad_inches=0.1)
+                buf.seek(0)
+                plt.close()
+                return buf
+                
+        except Exception as e:
+            return None
 
     class ExamPDF(FPDF):
         def header(self):
@@ -1045,7 +1095,7 @@ def dialog_options():
     
     if g != st.session_state['grade']: 
         st.session_state['grade'] = g
-        st.rerun()
+        # st.rerun() removed to prevent closing dialog prematurely
 
     if st.session_state['grade'] == "University Math":
         s = st.selectbox(T("opt_subject"), ["Calculus", "Linear Algebra", "Statistics", "Topology", "Number Theory"], format_func=get_option_label, key="opt_subj")
@@ -1286,6 +1336,10 @@ def apply_custom_css():
             fill: {primary} !important;
             color: {primary} !important;
         }}
+        /* Answer & Solution Border Fix */
+        [data-testid="stVerticalBlockBorderWrapper"] {
+             border-color: {primary} !important;
+        }
         </style>
     """, unsafe_allow_html=True)
 
@@ -1389,18 +1443,28 @@ def main_app_interface():
                         st.session_state['generated_figure'] = fig 
                     except: pass
                 
-                with st.expander(T("answer_solution")):
-                    st.markdown(f"**Ans:** {data.get('answer')}")
-                    st.divider()
-                    sol = str(data.get('solution')).replace('\\n', '\n').replace('\n', '\n\n')
-                    st.markdown(f"**Solution:**\n\n{normalize_latex_text(sol)}")
+                # Answer & Solution wrapped in bordered container
+                with st.container(border=True):
+                    with st.expander(T("answer_solution")):
+                        st.markdown(f"**Ans:** {data.get('answer')}")
+                        st.divider()
+                        sol = str(data.get('solution')).replace('\\n', '\n').replace('\n', '\n\n')
+                        st.markdown(f"**Solution:**\n\n{normalize_latex_text(sol)}")
                 
                 st.divider()
                 
                 c_tit, c_mode = st.columns([2, 1])
                 title = c_tit.text_input("File Name", value=f"{st.session_state['grade']} Math Twin Problem")
-                export_mode = c_mode.selectbox("Export Mode", ["Integrated", "Problem Only", "Solution Only"], label_visibility="collapsed")
+                export_mode = c_mode.selectbox("Export Mode", [T("export_mode_integrated"), T("export_mode_problem"), T("export_mode_solution")], label_visibility="collapsed")
                 
+                # Map translated options back to internal keys
+                mode_map = {
+                    T("export_mode_integrated"): "Integrated",
+                    T("export_mode_problem"): "Problem Only",
+                    T("export_mode_solution"): "Solution Only"
+                }
+                internal_mode = mode_map.get(export_mode, "Integrated")
+
                 # Figure handling for PDF
                 fig_img = None
                 if st.session_state.get('generated_figure'):
@@ -1409,7 +1473,7 @@ def main_app_interface():
                      buf.seek(0)
                      fig_img = Image.open(buf)
 
-                pdf_bytes = PDFGenerator.create_single_pdf(data, title, fig_img, export_mode)
+                pdf_bytes = PDFGenerator.create_single_pdf(data, title, fig_img, internal_mode)
                 
                 if pdf_bytes:
                      st.download_button(T("download_pdf"), data=bytes(pdf_bytes), file_name=f"{title}.pdf", mime="application/pdf", use_container_width=True)
