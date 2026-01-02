@@ -87,7 +87,7 @@ for k, v in default_session.items():
 UI_TEXT = {
     "Korean": {
         "guide_btn": "📖 가이드", "api_btn": "🔑 API 설정", "options_btn": "📝 옵션",
-        "materials_btn": "📚 자료함", "style_btn": "🖼️ 스타 noti", "theme_btn": "🎨 테마",
+        "materials_btn": "📚 자료함", "style_btn": "🖼️ 스타일", "theme_btn": "🎨 테마",
         "data_btn": "🗑️ 데이터", "sidebar_header": "📚 추천 학습 자료",
         "api_check_btn": "연결 확인", "api_success": "✅ API 키가 로드되었습니다", "api_error": "API 키가 필요합니다",
         "api_input_label": "🔑 API 키 입력", "original_card": "📸 원본 문제", "result_card": "✨ 생성 결과",
@@ -1342,5 +1342,6 @@ def main():
     main_app_interface()
 if __name__ == "__main__":
     main()
+
 
 
