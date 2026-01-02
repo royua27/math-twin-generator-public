@@ -196,7 +196,7 @@ def display_sidebar_ads():
     ad_html = f"""
     <div style="text-align: center; margin-bottom: 15px; background-color: #2F2E35; padding: 10px; border-radius: 10px; border: 1px solid #403e41;">
         <p style="color: #e4c1b2; font-size: 0.9em; margin-bottom: 5px;">{T("ad_title")}</p>
-        <a href="https://www.coupang.com/" target="_blank" style="text-decoration: none;">
+        <a href="https://link.coupang.com/a/dkjnPF" target="_blank" style="text-decoration: none;">
             <div style="background-color: #eee; color: #333; padding: 15px; border-radius: 5px; font-weight: bold; font-size: 0.9em;">
                 {T("ad_content")}<br>오늘의 꿀템은 뭘까요?<br>
                 <span style="font-size: 0.8em; color: #666;">{T("ad_click")}</span>
@@ -1342,4 +1342,5 @@ def main():
     main_app_interface()
 if __name__ == "__main__":
     main()
+
 
