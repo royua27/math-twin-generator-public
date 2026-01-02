@@ -261,7 +261,7 @@ def display_bottom_ad():
         <div style="color: #e0e0e0; font-size: 0.9rem; margin-bottom: 6px;">
             {T("bottom_ad_desc")}
         </div>
-        <a href="{partners_link}" target="_blank" style="text-decoration: none;">
+        <a href="https://link.coupang.com/a/dkjUiJ" target="_blank" style="text-decoration: none;">
             <div style="
                 background-color: #008CFA;
                 color: white;
@@ -1342,6 +1342,7 @@ def main():
     main_app_interface()
 if __name__ == "__main__":
     main()
+
 
 
 
