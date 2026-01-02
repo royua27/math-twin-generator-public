@@ -90,7 +90,7 @@ def setup_fonts():
 
 setup_fonts()
 
-# Session State Init (로그인 관련 변수 제거)
+# Session State Init
 default_session = {
     'curriculum_text': "", 'base_ref_text': "", 'generated_data': None,
     'img_rotation': 0, 'processed_file_id': None, 'valid_model_name': None,
@@ -101,10 +101,90 @@ default_session = {
     'theme_primary': "#e4c1b2", 'theme_bg': "#242329", 'theme_text': "#ded5d2",
     'bg_image_file': None,
     'grade': "Middle 1", 'difficulty': "Maintain", 'prob_type': "Any", 'creativity': 0.4,
-    'subject': None
+    'subject': None,
+    'language': 'Korean' # Default Language
 }
 for k, v in default_session.items():
     if k not in st.session_state: st.session_state[k] = v
+
+# UI Text Dictionary
+UI_TEXT = {
+    "Korean": {
+        "guide_btn": "📖 가이드",
+        "api_btn": "🔑 API 설정",
+        "options_btn": "📝 옵션",
+        "materials_btn": "📚 자료함",
+        "style_btn": "🖼️ 스타일",
+        "theme_btn": "🎨 테마",
+        "data_btn": "🗑️ 데이터",
+        "sidebar_header": "📚 추천 학습 자료",
+        "api_check_btn": "연결 확인",
+        "api_success": "✅ API 키가 로드되었습니다",
+        "api_error": "API 키가 필요합니다",
+        "api_input_label": "🔑 API 키 입력",
+        "original_card": "📸 원본 문제",
+        "result_card": "✨ 생성 결과",
+        "upload_label": "업로드",
+        "generate_btn": "✨ 생성하기",
+        "generating_status": "생성 중...",
+        "answer_solution": "정답 및 해설",
+        "download_pdf": "📥 PDF 다운로드",
+        "history_tab": "📜 히스토리",
+        "result_tab": "✨ 결과",
+        "recent_history": "최근 기록",
+        "zip_download": "📦 전체 다운로드 (ZIP)",
+        "csv_download": "📊 CSV 저장",
+        "select_all": "전체 선택",
+        "view_details": "상세 보기",
+        "delete": "삭제",
+        "create_workbook": "📚 워크북 생성",
+        "no_history": "기록이 없습니다.",
+        "tip_title": "💡 Tip",
+        "tip_content": "문제를 만드느라 힘드셨죠?<br><a href='https://www.starbucks.co.kr' target='_blank' style='color: #4CAF50; text-decoration: underline;'>여기서 커피 한 잔 하세요!</a>",
+        "ad_title": "🔥 선생님 필수템",
+        "ad_content": "수학 교구 모음전",
+        "ad_click": "(클릭하여 보기)"
+    },
+    "English": {
+        "guide_btn": "📖 Guide",
+        "api_btn": "🔑 API Settings",
+        "options_btn": "📝 Options",
+        "materials_btn": "📚 Materials",
+        "style_btn": "🖼️ Style",
+        "theme_btn": "🎨 Theme",
+        "data_btn": "🗑️ Data",
+        "sidebar_header": "📚 Recommended",
+        "api_check_btn": "Check Connection",
+        "api_success": "✅ API Key Loaded",
+        "api_error": "API Key Required",
+        "api_input_label": "🔑 Enter API Key",
+        "original_card": "📸 Original",
+        "result_card": "✨ Result",
+        "upload_label": "Upload",
+        "generate_btn": "✨ Generate",
+        "generating_status": "Generating...",
+        "answer_solution": "Answer & Solution",
+        "download_pdf": "📥 Download PDF",
+        "history_tab": "📜 History",
+        "result_tab": "✨ Result",
+        "recent_history": "Recent History",
+        "zip_download": "📦 Download ZIP",
+        "csv_download": "📊 Save CSV",
+        "select_all": "Select All",
+        "view_details": "View Details",
+        "delete": "Delete",
+        "create_workbook": "📚 Create Workbook",
+        "no_history": "No history yet.",
+        "tip_title": "💡 Tip",
+        "tip_content": "Need a break?<br><a href='https://www.starbucks.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>Have a coffee here!</a>",
+        "ad_title": "🔥 Must-Have Items",
+        "ad_content": "Math Teaching Aids",
+        "ad_click": "(Click to view)"
+    }
+}
+
+def T(key):
+    return UI_TEXT[st.session_state['language']].get(key, key)
 
 # =========================================================================
 # 2. Ad & Marketing Components (광고 영역)
@@ -127,16 +207,16 @@ def display_sidebar_ads():
     """, unsafe_allow_html=True)
     
     st.sidebar.markdown("---")
-    st.sidebar.header("📚 추천 학습 자료")
+    st.sidebar.header(T("sidebar_header"))
     
     # [광고 1] 쿠팡/YES24 파트너스 링크 (밝은 배경)
-    ad_html = """
+    ad_html = f"""
     <div style="text-align: center; margin-bottom: 15px; background-color: #2F2E35; padding: 10px; border-radius: 10px; border: 1px solid #403e41;">
-        <p style="color: #e4c1b2; font-size: 0.9em; margin-bottom: 5px;">🔥 선생님 필수템</p>
+        <p style="color: #e4c1b2; font-size: 0.9em; margin-bottom: 5px;">{T("ad_title")}</p>
         <a href="https://www.coupang.com/" target="_blank" style="text-decoration: none;">
             <div style="background-color: #eee; color: #333; padding: 15px; border-radius: 5px; font-weight: bold; font-size: 0.9em;">
-                수학 교구 모음전<br>
-                <span style="font-size: 0.8em; color: #666;">(클릭하여 보기)</span>
+                {T("ad_content")}<br>
+                <span style="font-size: 0.8em; color: #666;">{T("ad_click")}</span>
             </div>
         </a>
     </div>
@@ -144,12 +224,11 @@ def display_sidebar_ads():
     st.sidebar.markdown(ad_html, unsafe_allow_html=True)
     
     # [광고 2] 팁 영역
-    tip_html = """
+    tip_html = f"""
     <div style="margin-top: 10px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 8px; border-left: 3px solid #e4c1b2;">
-        <div style="color: #e4c1b2; font-weight: bold; font-size: 0.9em; margin-bottom: 5px;">💡 Tip</div>
+        <div style="color: #e4c1b2; font-weight: bold; font-size: 0.9em; margin-bottom: 5px;">{T("tip_title")}</div>
         <div style="color: #e0e0e0; font-size: 0.85em; line-height: 1.4;">
-            문제를 만드느라 힘드셨죠?<br>
-            <a href="https://www.starbucks.co.kr" target="_blank" style="color: #4CAF50; text-decoration: underline;">여기서 커피 한 잔 하세요!</a>
+            {T("tip_content")}
         </div>
     </div>
     """
@@ -702,7 +781,7 @@ class GeminiClient:
                 time.sleep(5); return GeminiClient.call_api(api_key, payload, active_model_name, retry+1)
             return f"Network Error: {str(e)}", m
 
-def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, style_img, temperature, p_type, subject=None):
+def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, style_img, temperature, p_type, subject=None, lang="Korean"):
     opt_img = image.copy(); opt_img.thumbnail((800, 800))
     if opt_img.mode != 'RGB': opt_img = opt_img.convert('RGB')
     buf = io.BytesIO(); opt_img.save(buf, format="JPEG"); img_str = base64.b64encode(buf.getvalue()).decode("utf-8")
@@ -746,11 +825,17 @@ def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, st
     if p_type == "Multiple Choice": type_inst = "Make this a multiple choice question with 5 options (①~⑤)."
     elif p_type == "Essay": type_inst = "Make this a narrative/essay type question requiring logical explanation."
 
+    # Language instruction
+    if lang == "English":
+        lang_line = "1. **Language:** Provide the Problem, Solution, and Explanation in **English**."
+    else:
+        lang_line = "1. **언어:** 문제, 풀이, 해설 등 모든 텍스트는 **반드시 한국어(Korean)**로 작성하십시오."
+
     parts = [{"text": f"""
     당신은 대한민국 수학 교육 전문가입니다. 입력된 이미지의 문제를 분석하여, 동일한 수학적 개념을 묻는 '{grade_kr}' 수준(난이도:{diff_kr})의 새로운 '쌍둥이 문제'를 만드십시오.
     
     [필수 지침]
-    1. **언어:** 문제, 풀이, 해설 등 모든 텍스트는 **반드시 한국어(Korean)**로 작성하십시오.
+    {lang_line}
     2. **용어 제한(중요):** 대한민국 초/중/고등학교 교육과정 내의 표준 용어만 사용하십시오.
         - 금지: '상한(Upper limit)', '하한(Lower limit)' 용어 사용 금지.
         - 대체: 정적분의 구간은 '위끝', '아래끝'으로 표현하십시오. 해석학적 의미의 상한(Supremum) 개념은 고교 과정에서 다루지 않으므로 사용하지 마십시오.
@@ -772,7 +857,7 @@ def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, st
     payload = {"contents": [{"parts": parts}], "safetySettings": [{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}], "generationConfig": {"temperature": 0.1, "response_mime_type": "application/json"}}
     return GeminiClient.call_api(api_key, payload)
 
-def refine_final(api_key, draft, style_img, grade, subject=None):
+def refine_final(api_key, draft, style_img, grade, subject=None, lang="Korean"):
     grade_map = {
         "Elementary 3": "초등학교 3학년", "Elementary 4": "초등학교 4학년", "Elementary 5": "초등학교 5학년", "Elementary 6": "초등학교 6학년",
         "Middle 1": "중학교 1학년", "Middle 2": "중학교 2학년", "Middle 3": "중학교 3학년",
@@ -804,11 +889,17 @@ def refine_final(api_key, draft, style_img, grade, subject=None):
         - 계산 과정에 오류가 있다면 수정하십시오.
         """
 
+    # Language instruction
+    if lang == "English":
+        lang_line = "1. **Language:** The final problem, solution, and answer must be in **English**."
+    else:
+        lang_line = "1. **언어:** 모든 내용은 **한국어(Korean)**로 작성되어야 합니다."
+
     prompt = f"""
     당신은 대한민국 수학 문제 검토 위원장입니다. 아래 초안(Draft)을 면밀히 검토하고, 오류가 있다면 수정한 뒤 최종본을 JSON 포맷으로 작성하십시오.
     
     [검토 및 수정 지침]
-    1. **언어:** 모든 내용은 **한국어(Korean)**로 작성되어야 합니다.
+    {lang_line}
     2. **풀이 검증:** 논리적 비약이나 계산 오류가 없어야 합니다. 풀이는 '1단계', '2단계' 또는 'Step 1', 'Step 2'와 같이 단계별로 명확히 서술하십시오.
     3. **줄바꿈:** 풀이 과정에서 수식과 수식 사이, 문장과 문장 사이에는 줄바꿈(`\\n\\n`)을 충분히 사용하여 가독성을 높이십시오.
     4. **용어 점검:** {grade_kr} 수준에 맞는 용어를 사용하십시오. 특히 '상한', '하한' 등의 용어가 있다면 '위끝', '아래끝' 또는 적절한 교육과정 내 용어로 수정하십시오.
@@ -1079,24 +1170,29 @@ def main_app_interface():
         api_key = st.secrets["GEMINI_API_KEY"]
     
     with st.sidebar:
-        if st.button("📖 Guide", use_container_width=True): dialog_guide()
+        # Language Selector
+        lang_code = st.radio("Language / 언어", ["Korean", "English"], horizontal=True, label_visibility="collapsed")
+        st.session_state['language'] = lang_code
+
+        if st.button(T("guide_btn"), use_container_width=True): dialog_guide()
         
         # API Key Input if not in Secrets
         if not api_key:
-            new_key = st.text_input("🔑 API Key", type="password")
+            new_key = st.text_input(T("api_input_label"), type="password")
             if new_key: st.session_state['api_key'] = new_key; api_key = new_key
-            if st.button("Check Connection"):
+            if st.button(T("api_check_btn")):
                  ok, msg = GeminiClient.test_api_connection(api_key)
-                 if ok: st.success(msg)
+                 if ok: st.success(T("api_success"))
                  else: st.error(msg)
         else:
-            st.success("✅ API Key Loaded")
+            # [Change] Removed the success message as requested
+            pass 
 
-        if st.button("📝 Options", use_container_width=True): dialog_options()
-        if st.button("📚 Materials", use_container_width=True): dialog_materials()
-        if st.button("🖼️ Style", use_container_width=True): dialog_style()
-        if st.button("🎨 Theme", use_container_width=True): dialog_theme()
-        if st.button("🗑️ Data", use_container_width=True): dialog_data()
+        if st.button(T("options_btn"), use_container_width=True): dialog_options()
+        if st.button(T("materials_btn"), use_container_width=True): dialog_materials()
+        if st.button(T("style_btn"), use_container_width=True): dialog_style()
+        if st.button(T("theme_btn"), use_container_width=True): dialog_theme()
+        if st.button(T("data_btn"), use_container_width=True): dialog_data()
         
         st.divider()
         st.markdown(f"""
@@ -1113,18 +1209,19 @@ def main_app_interface():
 
     c1, c2 = st.columns([1, 1.2])
     with c1:
-        with st.container():
-            st.markdown('<div class="result-card"><div class="result-header">📸 Original</div>', unsafe_allow_html=True)
+        # [Design Fix] Removed custom header HTML for 'Original' and used st.tabs instead to match right column
+        tab_original_list = st.tabs([T("original_card")])
+        with tab_original_list[0]:
             with st.container(border=True):
-                q_file = st.file_uploader("Upload", type=['png','jpg','jpeg','pdf'], key="uploader")
+                q_file = st.file_uploader(T("upload_label"), type=['png','jpg','jpeg','pdf'], key="uploader")
                 if q_file:
                     img = pdf_to_image(q_file) if q_file.type == 'application/pdf' else Image.open(q_file)
                     st.image(img, use_container_width=True)
                     
-                    if st.button("✨ Generate", type="primary", disabled=not api_key, use_container_width=True):
-                        with st.status("Generating..."):
-                            d_res, _ = generate_draft(api_key, img, st.session_state['difficulty'], st.session_state['grade'], st.session_state['curriculum_text'], "", st.session_state['style_img'], st.session_state['creativity'], st.session_state['prob_type'], st.session_state['subject'])
-                            f_res, _ = refine_final(api_key, d_res, st.session_state['style_img'], st.session_state['grade'], st.session_state['subject'])
+                    if st.button(T("generate_btn"), type="primary", disabled=not api_key, use_container_width=True):
+                        with st.status(T("generating_status")):
+                            d_res, _ = generate_draft(api_key, img, st.session_state['difficulty'], st.session_state['grade'], st.session_state['curriculum_text'], "", st.session_state['style_img'], st.session_state['creativity'], st.session_state['prob_type'], st.session_state['subject'], st.session_state['language'])
+                            f_res, _ = refine_final(api_key, d_res, st.session_state['style_img'], st.session_state['grade'], st.session_state['subject'], st.session_state['language'])
                         
                             st.session_state['generated_data'] = parse_gemini_json_response(f_res)
                             
@@ -1134,17 +1231,16 @@ def main_app_interface():
                                  st.session_state['history'].insert(0, history_item)
                                  
                             st.rerun()
-                    if not api_key: st.error("API Key Required")
-            st.markdown('</div>', unsafe_allow_html=True)
+                    if not api_key: st.error(T("api_error"))
 
     with c2:
-        tab_curr, tab_hist = st.tabs(["✨ Result", "📜 History"])
+        tab_curr, tab_hist = st.tabs([T("result_tab"), T("history_tab")])
         
         with tab_curr:
             if st.session_state.get('generated_data'):
                 data = st.session_state.get('generated_data')
                 with st.container():
-                    st.markdown('<div class="result-card"><div class="result-header">Result</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="result-card"><div class="result-header">{T("result_card")}</div>', unsafe_allow_html=True)
                     with st.container(border=True):
                         st.markdown(f"**Q.** {normalize_latex_text(data.get('problem'))}")
                     st.markdown('</div>', unsafe_allow_html=True)
@@ -1159,7 +1255,7 @@ def main_app_interface():
                         st.session_state['generated_figure'] = fig 
                     except: pass
                 
-                with st.expander("Answer & Solution"):
+                with st.expander(T("answer_solution")):
                     st.markdown(f"**Ans:** {data.get('answer')}")
                     st.divider()
                     sol = str(data.get('solution')).replace('\\n', '\n').replace('\n', '\n\n')
@@ -1182,7 +1278,7 @@ def main_app_interface():
                 pdf_bytes = PDFGenerator.create_single_pdf(data, title, fig_img, export_mode)
                 
                 if pdf_bytes:
-                     st.download_button("📥 Download PDF", data=bytes(pdf_bytes), file_name=f"{title}.pdf", mime="application/pdf", use_container_width=True)
+                     st.download_button(T("download_pdf"), data=bytes(pdf_bytes), file_name=f"{title}.pdf", mime="application/pdf", use_container_width=True)
                 
                 # [결과 하단 광고]
                 st.success("팁: 이 문제가 마음에 드셨나요? 더 많은 자료는 아래 링크를 확인해보세요!")
@@ -1199,16 +1295,16 @@ def main_app_interface():
         with tab_hist:
             if st.session_state['history']:
                 c_h_txt, c_h_btn1, c_h_btn2 = st.columns([3, 1, 1])
-                c_h_txt.write("Recent History")
-                if c_h_btn1.button("📦 ZIP Download", use_container_width=True):
+                c_h_txt.write(T("recent_history"))
+                if c_h_btn1.button(T("zip_download"), use_container_width=True):
                     zip_data = PDFGenerator.create_history_zip(st.session_state['history'])
                     st.download_button("Download ZIP", data=zip_data, file_name="math_problems.zip", mime="application/zip")
-                if c_h_btn2.button("📊 CSV Download", use_container_width=True):
+                if c_h_btn2.button(T("csv_download"), use_container_width=True):
                     csv_data = PDFGenerator.convert_history_to_csv(st.session_state['history'])
                     st.download_button("Download CSV", data=csv_data, file_name="history.csv", mime="text/csv")
 
                 if 'selected_indices' not in st.session_state: st.session_state['selected_indices'] = []
-                if st.checkbox("Select All", key='chk_all'):
+                if st.checkbox(T("select_all"), key='chk_all'):
                      st.session_state['selected_indices'] = list(range(len(st.session_state['history'])))
                 else:
                      if len(st.session_state['selected_indices']) == len(st.session_state['history']):
@@ -1230,11 +1326,11 @@ def main_app_interface():
                         grade_label = f"**[{item.get('grade', '?')}/{item.get('difficulty', '?')}]**"
                         prob_preview = normalize_latex_text(item['data'].get('problem', ''))
                         st.markdown(f"{grade_label} {prob_preview}")
-                        with st.expander("View Details"):
+                        with st.expander(T("view_details")):
                             st.markdown(normalize_latex_text(item['data'].get('problem')))
                             st.divider()
                             st.write(f"**Answer:** {item['data'].get('answer')}")
-                            if st.button("Delete", key=f"del_{i}"):
+                            if st.button(T("delete"), key=f"del_{i}"):
                                 st.session_state['history'].pop(i)
                                 st.rerun()
                     st.divider()
@@ -1244,13 +1340,13 @@ def main_app_interface():
                     c_w_tit, c_w_mode = st.columns([3, 1])
                     wb_title = c_w_tit.text_input("Workbook Title", value="My Math Workbook")
                     wb_mode = c_w_mode.selectbox("Workbook Mode", ["Integrated", "Problem Only", "Solution Only"])
-                    if st.button(f"📚 Create Workbook ({len(selected_items)} problems)"):
+                    if st.button(f"{T('create_workbook')} ({len(selected_items)} problems)"):
                         with st.spinner("Creating Workbook..."):
                             wb_bytes = PDFGenerator.create_workbook_pdf(selected_items, wb_title, wb_mode)
                             if wb_bytes:
                                 st.download_button("📥 Download Workbook", data=bytes(wb_bytes), file_name="workbook.pdf", mime="application/pdf", use_container_width=True)
             else:
-                st.info("No history yet.")
+                st.info(T("no_history"))
 
 def main():
     apply_custom_css()
