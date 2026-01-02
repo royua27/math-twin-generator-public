@@ -1,10 +1,4 @@
-# -------------------------------------------------------------------------
-# Math Twin Generator - Public Full Version (Ad-Supported)
-# -------------------------------------------------------------------------
-
 import streamlit as st
-# [Fix] Removed unused import that causes ModuleNotFoundError
-# import google.generativeai as genai 
 from PIL import Image
 import io
 import os
@@ -21,7 +15,6 @@ import tempfile
 import zipfile
 import csv
 
-# [Fix] Import PyMuPDF safely with error handling
 try:
     import fitz  # PyMuPDF
 except ImportError:
@@ -30,22 +23,18 @@ except ImportError:
     st.stop()
 
 from fpdf import FPDF
-
-# [Fix] Matplotlib GUI backend conflict prevention
-matplotlib.use('Agg') 
-import matplotlib.pyplot as plt 
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
-import numpy as np 
+import numpy as np
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-# SSL Warning Suppression
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # =========================================================================
 # 1. Initialization & Configuration
 # =========================================================================
-
 st.set_page_config(
     page_title="Math Twin Generator",
     page_icon="📐",
@@ -53,14 +42,12 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# 기본 설정 및 경로
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 FONT_FILENAME = "NanumGothic.ttf"
 FONT_PATH = os.path.join(BASE_DIR, FONT_FILENAME)
 REF_DIR_NAME = "references"
 REF_DIR_PATH = os.path.join(BASE_DIR, REF_DIR_NAME)
 
-# 폰트 다운로드 및 설정
 @st.cache_resource
 def setup_fonts():
     font_ready = False
@@ -69,191 +56,116 @@ def setup_fonts():
             url = "https://github.com/google/fonts/raw/main/ofl/nanumgothic/NanumGothic-Regular.ttf"
             res = requests.get(url, timeout=5)
             if res.status_code == 200:
-                with open(FONT_PATH, "wb") as f: f.write(res.content)
-        except: pass
-
+                with open(FONT_PATH, "wb") as f:
+                    f.write(res.content)
+            else:
+                st.toast("폰트 다운로드 실패. 기본 폰트 사용.", icon="⚠️")
+        except:
+            st.toast("폰트 다운로드 실패. 기본 폰트 사용.", icon="⚠️")
     if os.path.exists(FONT_PATH):
         try:
             fm.fontManager.addfont(FONT_PATH)
-            # [Fix] Set font globally for Matplotlib to handle mixed content better
             plt.rcParams['font.family'] = ['NanumGothic', 'DejaVu Sans']
-            plt.rcParams['mathtext.fontset'] = 'cm' # Use Computer Modern for math
+            plt.rcParams['mathtext.fontset'] = 'cm'
             plt.rcParams['axes.unicode_minus'] = False
             font_ready = True
-        except: pass
-    
+        except:
+            pass
     if not font_ready:
         plt.rcParams['font.family'] = 'sans-serif'
         plt.rcParams['axes.unicode_minus'] = False
-    
     return font_ready
 
 setup_fonts()
 
-# Session State Init
 default_session = {
     'curriculum_text': "", 'base_ref_text': "", 'generated_data': None,
-    'img_rotation': 0, 'processed_file_id': None, 'valid_model_name': None,
-    'generated_figure': None, 'raw_response': "", 'history': [],
-    'selected_indices': [], 'api_key': "", 'last_used_model': "",
-    'preferred_model_mode': "Auto", 'style_img': None,
-    'user_answer': "", 'show_grading': False,
-    'theme_primary': "#e4c1b2", 'theme_bg': "#242329", 'theme_text': "#ded5d2",
+    'valid_model_name': None,
+    'generated_figure': None, 'history': [],
+    'api_key': "", 'style_img': None,
     'bg_image_file': None,
     'grade': "Middle 1", 'difficulty': "Maintain", 'prob_type': "Any", 'creativity': 0.4,
     'subject': None,
-    'language': 'Korean' # Default Language
+    'language': 'Korean',
+    'theme_primary': "#e4c1b2", 'theme_bg': "#242329", 'theme_text': "#ded5d2"
 }
 for k, v in default_session.items():
-    if k not in st.session_state: st.session_state[k] = v
+    if k not in st.session_state:
+        st.session_state[k] = v
 
-# UI Text Dictionary
 UI_TEXT = {
     "Korean": {
-        "guide_btn": "📖 가이드",
-        "api_btn": "🔑 API 설정",
-        "options_btn": "📝 옵션",
-        "materials_btn": "📚 자료함",
-        "style_btn": "🖼️ 스타일",
-        "theme_btn": "🎨 테마",
-        "data_btn": "🗑️ 데이터",
-        "sidebar_header": "📚 추천 학습 자료",
-        "api_check_btn": "연결 확인",
-        "api_success": "✅ API 키가 로드되었습니다",
-        "api_error": "API 키가 필요합니다",
-        "api_input_label": "🔑 API 키 입력",
-        "original_card": "📸 원본 문제",
-        "result_card": "✨ 생성 결과",
-        "upload_label": "업로드",
-        "generate_btn": "✨ 변형 문제 만들기",
-        "generating_status": "변형 문제 만드는 중...",
-        "answer_solution": "정답 및 해설",
-        "download_pdf": "📥 PDF 다운로드",
-        "history_tab": "📜 히스토리",
-        "result_tab": "✨ 결과",
-        "recent_history": "최근 기록",
-        "zip_download": "📦 전체 다운로드 (ZIP)",
-        "csv_download": "📊 CSV 저장",
-        "select_all": "전체 선택",
-        "view_details": "상세 보기",
-        "delete": "삭제",
-        "create_workbook": "📚 워크북 생성",
-        "no_history": "기록이 없습니다.",
-        # Tip Section
+        "guide_btn": "📖 가이드", "api_btn": "🔑 API 설정", "options_btn": "📝 옵션",
+        "materials_btn": "📚 자료함", "style_btn": "🖼️ 스타일", "theme_btn": "🎨 테마",
+        "data_btn": "🗑️ 데이터", "sidebar_header": "📚 추천 학습 자료",
+        "api_check_btn": "연결 확인", "api_success": "✅ API 키가 로드되었습니다", "api_error": "API 키가 필요합니다",
+        "api_input_label": "🔑 API 키 입력", "original_card": "📸 원본 문제", "result_card": "✨ 생성 결과",
+        "upload_label": "업로드", "generate_btn": "✨ 변형 문제 만들기", "generating_status": "변형 문제 만드는 중...",
+        "answer_solution": "정답 및 해설", "download_pdf": "📥 PDF 다운로드",
+        "history_tab": "📜 히스토리", "result_tab": "✨ 결과", "recent_history": "최근 기록",
+        "zip_download": "📦 전체 다운로드 (ZIP)", "csv_download": "📊 CSV 저장",
+        "select_all": "전체 선택", "view_details": "상세 보기", "delete": "삭제",
+        "create_workbook": "📚 워크북 생성", "no_history": "기록이 없습니다.",
         "tip_title": "📚 선생님을 위한 추천 도서",
         "tip_content": "수업 퀄리티를 높여줄 필독서와 베스트셀러 문제집을 확인해보세요!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>베스트셀러 보러가기</a>",
-        "ad_title": "🔥 선생님 필수템",
-        "ad_content": "수학 교구 모음전",
-        "ad_click": "(클릭하여 보기)",
-        # Bottom Ad
-        "bottom_ad_prefix": "🚀 ",
-        "bottom_ad_suffix": " 수학 성적 수직 상승의 비밀?",
+        "ad_title": "🔥 선생님 필수템", "ad_content": "수학 교구 모음전", "ad_click": "(클릭하여 보기)",
+        "bottom_ad_prefix": "🚀 ", "bottom_ad_suffix": " 수학 성적 수직 상승의 비밀?",
         "bottom_ad_desc": "이 문제로 부족하다면? <b>지금 가장 많이 팔리는 문제집</b>을 확인해보세요.",
         "bottom_ad_btn": "🏆 최저가 보러가기",
-        # Dialogs Translations
-        "opt_caption": "문제 생성 설정",
-        "opt_grade": "학년",
-        "opt_subject": "과목",
-        "opt_diff": "난이도",
-        "opt_type": "문제 유형",
-        "opt_save": "저장 및 닫기",
+        "opt_caption": "문제 생성 설정", "opt_grade": "학년", "opt_subject": "과목",
+        "opt_diff": "난이도", "opt_type": "문제 유형", "opt_save": "저장 및 닫기",
         "guide_md": """### 사용 방법
 1. **🔑 API**: Google Gemini API 키를 입력하세요.
 2. **📝 옵션**: 학년과 난이도를 설정하세요.
 3. **📸 업로드**: 문제 이미지를 드래그 앤 드롭하세요.
 4. **✨ 생성**: '변형 문제 만들기' 버튼을 클릭하세요!""",
-        "mat_caption": "참고 자료 업로드 (PDF/TXT)",
-        "mat_loaded": "로딩됨: {len} 자",
-        "mat_upload": "파일 업로드",
-        "mat_success": "자료가 추가되었습니다!",
-        "style_caption": "스타일 참조 이미지 업로드",
-        "style_label": "참조 이미지",
-        "style_success": "스타일이 적용되었습니다!",
-        "style_current": "현재 스타일",
-        "theme_caption": "색상 사용자 정의",
-        "theme_primary": "기본 색상 (Primary)",
-        "theme_bg": "배경 색상",
-        "theme_text": "텍스트 색상",
-        "theme_bg_img": "배경 이미지",
-        "theme_apply": "테마 적용",
-        "data_warn": "이 작업은 되돌릴 수 없습니다.",
+        "mat_caption": "참고 자료 업로드 (PDF/TXT)", "mat_loaded": "로딩됨: {len} 자",
+        "mat_upload": "파일 업로드", "mat_success": "자료가 추가되었습니다!",
+        "style_caption": "스타일 참조 이미지 업로드", "style_label": "참조 이미지",
+        "style_success": "스타일이 적용되었습니다!", "style_current": "현재 스타일",
+        "theme_caption": "색상 사용자 정의", "theme_primary": "기본 색상 (Primary)",
+        "theme_bg": "배경 색상", "theme_text": "텍스트 색상", "theme_bg_img": "배경 이미지",
+        "theme_apply": "테마 적용", "data_warn": "이 작업은 되돌릴 수 없습니다.",
         "data_clear": "모든 기록 삭제",
-        # Export Modes
-        "export_mode_integrated": "통합본 (문제+해설)",
-        "export_mode_problem": "문제만",
+        "export_mode_integrated": "통합본 (문제+해설)", "export_mode_problem": "문제만",
         "export_mode_solution": "해설만"
     },
     "English": {
-        "guide_btn": "📖 Guide",
-        "api_btn": "🔑 API Settings",
-        "options_btn": "📝 Options",
-        "materials_btn": "📚 Materials",
-        "style_btn": "🖼️ Style",
-        "theme_btn": "🎨 Theme",
-        "data_btn": "🗑️ Data",
-        "sidebar_header": "📚 Recommended",
-        "api_check_btn": "Check Connection",
-        "api_success": "✅ API Key Loaded",
-        "api_error": "API Key Required",
-        "api_input_label": "🔑 Enter API Key",
-        "original_card": "📸 Original",
-        "result_card": "✨ Result",
-        "upload_label": "Upload",
-        "generate_btn": "✨ Generate Twin Problem",
-        "generating_status": "Generating Twin Problem...",
-        "answer_solution": "Answer & Solution",
-        "download_pdf": "📥 Download PDF",
-        "history_tab": "📜 History",
-        "result_tab": "✨ Result",
-        "recent_history": "Recent History",
-        "zip_download": "📦 Download ZIP",
-        "csv_download": "📊 Save CSV",
-        "select_all": "Select All",
-        "view_details": "View Details",
-        "delete": "Delete",
-        "create_workbook": "📚 Create Workbook",
-        "no_history": "No history yet.",
-        # Tip Section
+        "guide_btn": "📖 Guide", "api_btn": "🔑 API Settings", "options_btn": "📝 Options",
+        "materials_btn": "📚 Materials", "style_btn": "🖼️ Style", "theme_btn": "🎨 Theme",
+        "data_btn": "🗑️ Data", "sidebar_header": "📚 Recommended",
+        "api_check_btn": "Check Connection", "api_success": "✅ API Key Loaded",
+        "api_error": "API Key Required", "api_input_label": "🔑 Enter API Key",
+        "original_card": "📸 Original", "result_card": "✨ Result",
+        "upload_label": "Upload", "generate_btn": "✨ Generate Twin Problem",
+        "generating_status": "Generating Twin Problem...", "answer_solution": "Answer & Solution",
+        "download_pdf": "📥 Download PDF", "history_tab": "📜 History", "result_tab": "✨ Result",
+        "recent_history": "Recent History", "zip_download": "📦 Download ZIP",
+        "csv_download": "📊 Save CSV", "select_all": "Select All", "view_details": "View Details",
+        "delete": "Delete", "create_workbook": "📚 Create Workbook", "no_history": "No history yet.",
         "tip_title": "📚 Recommended Books",
         "tip_content": "Check out the best-selling textbooks and must-read books for teachers!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>Go to YES24</a>",
-        "ad_title": "🔥 Must-Have Items",
-        "ad_content": "Math Teaching Aids",
-        "ad_click": "(Click to view)",
-        "bottom_ad_prefix": "🚀 ",
-        "bottom_ad_suffix": " Math Grades Booster!",
+        "ad_title": "🔥 Must-Have Items", "ad_content": "Math Teaching Aids", "ad_click": "(Click to view)",
+        "bottom_ad_prefix": "🚀 ", "bottom_ad_suffix": " Math Grades Booster!",
         "bottom_ad_desc": "Need more than AI problems? Check out the <b>Best Selling Workbooks</b>.",
         "bottom_ad_btn": "🏆 View Best Prices",
-        # Dialogs Translations
-        "opt_caption": "Customize problem generation",
-        "opt_grade": "Grade",
-        "opt_subject": "Subject",
-        "opt_diff": "Diff",
-        "opt_type": "Type",
+        "opt_caption": "Customize problem generation", "opt_grade": "Grade",
+        "opt_subject": "Subject", "opt_diff": "Diff", "opt_type": "Type",
         "opt_save": "Save & Close",
         "guide_md": """### How to Use
 1. **🔑 API**: Enter Google Gemini API Key.
 2. **📝 Options**: Set grade & difficulty.
 3. **📸 Upload**: Drag & drop problem image.
 4. **✨ Generate**: Click the button!""",
-        "mat_caption": "Upload reference materials (PDF/TXT)",
-        "mat_loaded": "Loaded: {len} chars",
-        "mat_upload": "Upload Files",
-        "mat_success": "Materials Added!",
-        "style_caption": "Upload an image to mimic its visual style",
-        "style_label": "Reference Image",
-        "style_success": "Style Applied!",
-        "style_current": "Current Style",
-        "theme_caption": "Customize colors",
-        "theme_primary": "Primary",
-        "theme_bg": "Background",
-        "theme_text": "Text",
-        "theme_bg_img": "Background Image",
-        "theme_apply": "Apply Theme",
-        "data_warn": "This action cannot be undone.",
+        "mat_caption": "Upload reference materials (PDF/TXT)", "mat_loaded": "Loaded: {len} chars",
+        "mat_upload": "Upload Files", "mat_success": "Materials Added!",
+        "style_caption": "Upload an image to mimic its visual style", "style_label": "Reference Image",
+        "style_success": "Style Applied!", "style_current": "Current Style",
+        "theme_caption": "Customize colors", "theme_primary": "Primary",
+        "theme_bg": "Background", "theme_text": "Text", "theme_bg_img": "Background Image",
+        "theme_apply": "Apply Theme", "data_warn": "This action cannot be undone.",
         "data_clear": "Clear All History",
-        # Export Modes
-        "export_mode_integrated": "Integrated",
-        "export_mode_problem": "Problem Only",
+        "export_mode_integrated": "Integrated", "export_mode_problem": "Problem Only",
         "export_mode_solution": "Solution Only"
     }
 }
@@ -261,7 +173,6 @@ UI_TEXT = {
 def T(key):
     return UI_TEXT[st.session_state['language']].get(key, key)
 
-# Helper for option translation display
 def get_option_label(option):
     if st.session_state['language'] == 'Korean':
         K_MAP = {
@@ -278,15 +189,11 @@ def get_option_label(option):
     return option
 
 # =========================================================================
-# 2. Ad & Marketing Components (광고 영역)
+# 2. Ad & Marketing Components
 # =========================================================================
-
 def display_sidebar_ads():
-    """사이드바 광고 배너 영역"""
-    # [Design Fix] Reduced spacing for sidebar elements via markdown CSS injection
     st.sidebar.markdown("""
         <style>
-        /* Reduce spacing in sidebar - Adjusted from -15px to -5px */
         [data-testid="stSidebar"] .stMarkdown, [data-testid="stSidebar"] .stButton {
             margin-bottom: -5px !important;
         }
@@ -296,11 +203,8 @@ def display_sidebar_ads():
         }
         </style>
     """, unsafe_allow_html=True)
-    
     st.sidebar.markdown("---")
     st.sidebar.header(T("sidebar_header"))
-    
-    # [광고 1] 쿠팡/YES24 파트너스 링크 (밝은 배경)
     ad_html = f"""
     <div style="text-align: center; margin-bottom: 15px; background-color: #2F2E35; padding: 10px; border-radius: 10px; border: 1px solid #403e41;">
         <p style="color: #e4c1b2; font-size: 0.9em; margin-bottom: 5px;">{T("ad_title")}</p>
@@ -313,8 +217,6 @@ def display_sidebar_ads():
     </div>
     """
     st.sidebar.markdown(ad_html, unsafe_allow_html=True)
-    
-    # [광고 2] 팁 영역 (YES24 도서 추천)
     tip_html = f"""
     <div style="margin-top: 10px; background-color: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 8px; border-left: 3px solid #e4c1b2;">
         <div style="color: #e4c1b2; font-weight: bold; font-size: 0.9em; margin-bottom: 5px;">{T("tip_title")}</div>
@@ -326,23 +228,17 @@ def display_sidebar_ads():
     st.sidebar.markdown(tip_html, unsafe_allow_html=True)
 
 def display_bottom_ad():
-    """화면 하단 배너 광고 (동적 타겟팅 적용 - 하단 고정 컴팩트 버전)"""
-    
-    # 현재 선택된 학년 가져오기
     current_grade = st.session_state.get('grade', '')
-    
-    # 학년별 검색 키워드 매핑 (쿠팡 검색용)
     search_keyword = "수학문제집"
-    if "Elementary" in current_grade or "초등" in current_grade: search_keyword = "초등수학문제집"
-    elif "Middle" in current_grade or "중학" in current_grade: search_keyword = "중등수학문제집"
-    elif "High" in current_grade or "고등" in current_grade: search_keyword = "고등수학문제집"
-    elif "University" in current_grade: search_keyword = "대학수학 전공서적"
-
-    # 파트너스 링크 (여기에 선생님의 쿠팡 파트너스 트래킹 링크를 넣으면 됩니다)
-    # 현재는 예시로 검색 결과 페이지 링크를 넣었습니다.
+    if "Elementary" in current_grade or "초등" in current_grade:
+        search_keyword = "초등수학문제집"
+    elif "Middle" in current_grade or "중학" in current_grade:
+        search_keyword = "중등수학문제집"
+    elif "High" in current_grade or "고등" in current_grade:
+        search_keyword = "고등수학문제집"
+    elif "University" in current_grade:
+        search_keyword = "대학수학 전공서적"
     partners_link = f"https://www.coupang.com/np/search?component=&q={search_keyword}&channel=user"
-    
-    # Premium Style Banner - Fixed Bottom, Compact Version, No Disclaimer
     ad_html = f"""
     <div style="
         position: fixed;
@@ -350,7 +246,7 @@ def display_bottom_ad():
         left: 50%;
         transform: translateX(-50%);
         z-index: 999;
-        width: 60%; 
+        width: 60%;
         max-width: 450px;
         background: linear-gradient(135deg, #2F2E35 0%, #1A1C24 100%);
         border: 1px solid #e4c1b2;
@@ -372,7 +268,7 @@ def display_bottom_ad():
         </div>
         <a href="{partners_link}" target="_blank" style="text-decoration: none;">
             <div style="
-                background-color: #008CFA; 
+                background-color: #008CFA;
                 color: white;
                 padding: 6px 20px;
                 border-radius: 15px;
@@ -390,13 +286,14 @@ def display_bottom_ad():
     st.markdown(ad_html, unsafe_allow_html=True)
 
 # =========================================================================
-# 3. Utilities & Logic (원본 기능 100% 복구)
+# 3. Utilities & Logic
 # =========================================================================
-
 def load_reference_materials():
     if not os.path.exists(REF_DIR_PATH):
-        try: os.makedirs(REF_DIR_PATH)
-        except: pass
+        try:
+            os.makedirs(REF_DIR_PATH)
+        except:
+            pass
         return "", 0
     combined_text = ""
     file_count = 0
@@ -408,15 +305,20 @@ def load_reference_materials():
                 try:
                     with fitz.open(file_path) as doc:
                         max_p = min(doc.page_count, 50)
-                        for i in range(max_p): combined_text += doc.load_page(i).get_text() + "\n"
+                        for i in range(max_p):
+                            combined_text += doc.load_page(i).get_text() + "\n"
                     file_count += 1
-                except: pass
+                except:
+                    pass
             elif filename.lower().endswith('.txt'):
                 try:
-                    with open(file_path, 'r', encoding='utf-8') as f: combined_text += f.read() + "\n"
+                    with open(file_path, 'r', encoding='utf-8') as f:
+                        combined_text += f.read() + "\n"
                     file_count += 1
-                except: pass
-    except: pass
+                except:
+                    pass
+    except:
+        pass
     return combined_text, file_count
 
 def check_files():
@@ -440,7 +342,8 @@ def extract_text_safe(uploaded_file):
                 for page_num in range(max_pages):
                     page = doc.load_page(page_num)
                     text_content += page.get_text()
-                if doc.page_count > 30: text_content += "\n...(omitted)..."
+                if doc.page_count > 30:
+                    text_content += "\n...(omitted)..."
         elif uploaded_file.type == "text/plain":
             text_content = file_bytes.decode("utf-8", errors='ignore')
         return text_content, None
@@ -452,35 +355,32 @@ def pdf_to_image(uploaded_file):
         uploaded_file.seek(0)
         file_bytes = uploaded_file.read()
         with fitz.open(stream=file_bytes, filetype="pdf") as doc:
-            if doc.page_count < 1: return None
+            if doc.page_count < 1:
+                return None
             page = doc.load_page(0)
-            zoom = 2; mat = fitz.Matrix(zoom, zoom)
+            zoom = 2
+            mat = fitz.Matrix(zoom, zoom)
             pix = page.get_pixmap(matrix=mat)
             img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
             return img
-    except: return None
+    except:
+        return None
 
 def normalize_latex_text(text):
-    if text is None: return ""
+    if text is None:
+        return ""
     text = str(text)
-    
-    # [Fix] Pre-process to improve Matplotlib MathText compatibility
-    # Replace \text{} with \mathrm{} as \text is not fully supported in matplotlib mathtext
     text = re.sub(r'\\text\{([^}]*)\}', r'\\mathrm{\1}', text)
-    
-    # Simplify environment blocks
     text = re.sub(r'\\begin\{cases\}', r'\{', text)
     text = re.sub(r'\\end\{cases\}', r'\}', text)
-    
-    # Standardize delimiters
     text = text.replace('$$', '$')
     text = text.replace('\\[', '$').replace('\\]', '$')
     text = text.replace('\\(', '$').replace('\\)', '$')
-    
     return text
 
 def clean_python_code(code):
-    if not code: return ""
+    if not code:
+        return ""
     code = re.sub(r'\\\s*\n', ' ', code)
     code = code.replace('plt.show()', '# plt.show() removed')
     return code
@@ -488,38 +388,47 @@ def clean_python_code(code):
 def validate_python_code(code):
     dangerous = ['import os', 'import sys', 'import subprocess', 'open(', 'exec(', 'eval(', '__import__', 'globals', 'locals', 'urllib', 'requests', 'socket']
     for kw in dangerous:
-        if kw in code: return False, f"Security Risk: {kw}"
+        if kw in code:
+            return False, f"Security Risk: {kw}"
     return True, "Safe"
 
 def split_long_latex(text, limit=75):
-    if not text: return ""
-    if not isinstance(text, str): text = str(text)
-    
+    if not text:
+        return ""
+    if not isinstance(text, str):
+        text = str(text)
+
     def replacer(match):
-        content = match.group(0) # $...$
+        content = match.group(0)
         inner = content[1:-1].strip()
-        if r'\begin{' in inner: return content
-        if len(inner) < limit: return content
-            
+        if r'\begin{' in inner:
+            return content
+        if len(inner) < limit:
+            return content
         if " = " in inner:
             parts = inner.split(" = ")
-            new_inner = f"{parts[0]}"
-            for part in parts[1:]: new_inner += f" $\n\n$ = {part}"
+            new_inner = parts[0].strip()
+            for part in parts[1:]:
+                new_inner += "\n\n=" + part.strip()
             return f"${new_inner}$"
         elif "=" in inner:
             parts = inner.split("=")
-            new_inner = f"{parts[0]}"
-            for part in parts[1:]: new_inner += f" $\n\n$ = {part}"
+            new_inner = parts[0].strip()
+            for part in parts[1:]:
+                new_inner += "\n\n=" + part.strip()
             return f"${new_inner}$"
-        
         for op in [" + ", " - "]:
             if op in inner:
                 parts = inner.split(op)
-                new_inner = f"{parts[0]}"
-                for part in parts[1:]: new_inner += f" $\n\n$ {op.strip()} {part}"
+                new_inner = parts[0].strip()
+                for part in parts[1:]:
+                    new_inner += "\n\n" + op.strip() + part.strip()
                 return f"${new_inner}$"
         return content
-    return re.sub(r'\$.*?\$', replacer, text, flags=re.DOTALL)
+    processed = re.sub(r'\$.*?\$', replacer, text, flags=re.DOTALL)
+    processed = re.sub(r'\$\s+', '$', processed)
+    processed = re.sub(r'\s+\$', '$', processed)
+    return processed
 
 def get_base64_of_bin_file(bin_file):
     data = bin_file.read()
@@ -532,7 +441,7 @@ def parse_gemini_json_response(text):
         data = json.loads(cleaned_text)
         required_keys = ["problem", "hint", "answer", "solution", "concept", "achievement_standard", "drawing_code"]
         for key in required_keys:
-            if key not in data: 
+            if key not in data:
                 data[key] = ""
             else:
                 val = data[key]
@@ -545,7 +454,6 @@ def parse_gemini_json_response(text):
                 else:
                     val = str(val)
                 data[key] = val
-
                 if key == "drawing_code":
                     data[key] = clean_python_code(data[key])
                 else:
@@ -554,12 +462,14 @@ def parse_gemini_json_response(text):
                         data[key] = split_long_latex(data[key], limit=75)
         return data
     except json.JSONDecodeError:
-        try: cleaned_text = cleaned_text.replace('\\', '\\\\')
-        except: pass
+        try:
+            cleaned_text = cleaned_text.replace('\\', '\\\\')
+        except:
+            pass
         extracted_data = {k: "" for k in ["problem", "hint", "answer", "solution", "concept", "achievement_standard", "drawing_code"]}
         patterns = {
             "concept": r'"concept"\s*:\s*"(.*?)"', "achievement_standard": r'"achievement_standard"\s*:\s*"(.*?)"',
-            "problem": r'"problem"\s*:\s*"(.*?)"', "hint": r'"hint"\s*:\s*"(.*?)"', 
+            "problem": r'"problem"\s*:\s*"(.*?)"', "hint": r'"hint"\s*:\s*"(.*?)"',
             "answer": r'"answer"\s*:\s*"(.*?)"', "solution": r'"solution"\s*:\s*"(.*?)"', "drawing_code": r'"drawing_code"\s*:\s*"(.*?)"'
         }
         for k, p in patterns.items():
@@ -570,72 +480,54 @@ def parse_gemini_json_response(text):
                     extracted_data[k] = clean_python_code(content)
                 else:
                     extracted_data[k] = normalize_latex_text(content)
-        if len(extracted_data["problem"]) > 10: return extracted_data
+        if len(extracted_data["problem"]) > 10:
+            return extracted_data
         return {"problem": text, "concept": "Parsing Error", "achievement_standard": "", "hint": "", "answer": "", "solution": "", "drawing_code": ""}
 
 # =========================================================================
-# 4. PDF Generator (원본 풀버전)
+# 4. PDF Generator
 # =========================================================================
-
 class PDFGenerator:
     @staticmethod
     def render_text_to_image(text, width_inch=8.0):
         try:
-            if not text or not text.strip(): return None
-            
-            # [Fix] Matplotlib configuration for better font fallback
+            if not text or not text.strip():
+                return None
             plt.rcParams['font.family'] = ['NanumGothic', 'DejaVu Sans']
             plt.rcParams['mathtext.fontset'] = 'cm'
             plt.rcParams['axes.unicode_minus'] = False
-            
-            plt.clf(); plt.close('all')
-            
-            # Additional normalization for rendering
+            plt.clf()
+            plt.close('all')
             text = normalize_latex_text(text)
-            
-            # Protect math blocks from being wrapped inside
             math_matches = []
-            def protect(m): 
+            def protect(m):
                 math_matches.append(m.group(0))
                 return f"__M_{len(math_matches)-1}__"
             protected_text = re.sub(r'\$.*?\$', protect, text, flags=re.DOTALL)
-            
             wrapped_lines = []
             for line in protected_text.split('\n'):
-                if not line.strip(): 
+                if not line.strip():
                     wrapped_lines.append("")
                     continue
-                # Wrap text but respect protection placeholders
                 lines = textwrap.wrap(line, width=50, break_long_words=False, break_on_hyphens=False)
                 wrapped_lines.extend(lines)
-            
             final_lines = []
             for line in wrapped_lines:
-                # Restore math blocks
                 restored = re.sub(r'__M_(\d+)__', lambda m: math_matches[int(m.group(1))], line)
                 final_lines.append(restored)
-            
             wrapped_text = '\n'.join(final_lines)
-            
-            # Calculate dynamic height based on line count
             height = max(1.0, len(final_lines) * 0.6) + 0.5
-            
             fig = plt.figure(figsize=(width_inch, height))
             fig.patch.set_facecolor('white')
-            
             try:
-                # Render text
                 plt.text(0.01, 0.98, wrapped_text, va='top', ha='left', fontsize=12)
                 plt.axis('off')
-                
                 buf = io.BytesIO()
                 plt.savefig(buf, format='png', bbox_inches='tight', dpi=300, pad_inches=0.1)
                 buf.seek(0)
                 plt.close()
                 return buf
-            except Exception as e:
-                # Fallback: remove math symbols if rendering fails completely
-                # print(f"Rendering failed: {e}")
+            except:
                 plt.clf()
                 clean_text = text.replace('$', '')
                 plt.text(0.01, 0.98, clean_text, va='top', ha='left', fontsize=12)
@@ -645,8 +537,7 @@ class PDFGenerator:
                 buf.seek(0)
                 plt.close()
                 return buf
-                
-        except Exception as e:
+        except:
             return None
 
     class ExamPDF(FPDF):
@@ -654,159 +545,198 @@ class PDFGenerator:
             if os.path.exists(FONT_PATH):
                 self.add_font('NanumGothic', '', FONT_PATH)
                 self.set_font('NanumGothic', '', 10)
-            else: self.set_font('helvetica', '', 10)
+            else:
+                self.set_font('helvetica', '', 10)
             self.cell(0, 10, 'Math Twin Generator - Public Edition', align='L')
-            self.ln(5); self.line(10, 20, 200, 20); self.ln(10)
+            self.ln(5)
+            self.line(10, 20, 200, 20)
+            self.ln(10)
 
         def footer(self):
             self.set_y(-15)
-            if os.path.exists(FONT_PATH): self.set_font('NanumGothic', '', 8)
-            else: self.set_font('helvetica', 'I', 8)
+            if os.path.exists(FONT_PATH):
+                self.set_font('NanumGothic', '', 8)
+            else:
+                self.set_font('helvetica', 'I', 8)
             self.cell(0, 10, f'Page {self.page_no()}', align='C')
-    
+
     @staticmethod
     def _add_image_to_pdf(pdf_obj, image_data, x=None, w=0):
-        if not image_data: return
+        if not image_data:
+            return
         data_bytes = None
-        if isinstance(image_data, io.BytesIO): data_bytes = image_data.getvalue()
+        if isinstance(image_data, io.BytesIO):
+            data_bytes = image_data.getvalue()
         elif isinstance(image_data, Image.Image):
-            buf = io.BytesIO(); image_data.save(buf, format="PNG"); data_bytes = buf.getvalue()
-        if not data_bytes: return
+            buf = io.BytesIO()
+            image_data.save(buf, format="PNG")
+            data_bytes = buf.getvalue()
+        if not data_bytes:
+            return
         try:
             with tempfile.NamedTemporaryFile(delete=False, suffix=".png") as tmp:
-                tmp.write(data_bytes); tmp_path = tmp.name
-            if x is not None: pdf_obj.image(tmp_path, x=x, w=w)
-            else: pdf_obj.image(tmp_path, w=w)
-        except: pass
+                tmp.write(data_bytes)
+                tmp_path = tmp.name
+            if x is not None:
+                pdf_obj.image(tmp_path, x=x, w=w)
+            else:
+                pdf_obj.image(tmp_path, w=w)
+        except:
+            pass
         finally:
             if 'tmp_path' in locals() and os.path.exists(tmp_path):
-                try: os.unlink(tmp_path)
-                except: pass
+                try:
+                    os.unlink(tmp_path)
+                except:
+                    pass
 
     @staticmethod
     def _generate_figure_from_code(code):
-        if not code or "plt" not in code: return None
+        if not code or "plt" not in code:
+            return None
         try:
             code = clean_python_code(code)
-            plt.clf(); plt.close('all'); fig = plt.figure()
+            plt.clf()
+            plt.close('all')
+            fig = plt.figure()
             local_vars = {'plt': plt, 'np': np}
             exec(code, local_vars)
-            buf = io.BytesIO(); plt.savefig(buf, format='png', bbox_inches='tight'); buf.seek(0)
+            buf = io.BytesIO()
+            plt.savefig(buf, format='png', bbox_inches='tight')
+            buf.seek(0)
             plt.close('all')
             return buf
-        except: return None
+        except:
+            return None
 
     @staticmethod
     def create_single_pdf(data, title, figure_image, export_mode="Integrated"):
         pdf = PDFGenerator.ExamPDF()
         pdf.add_page()
-        if os.path.exists(FONT_PATH): pdf.add_font('NanumGothic', '', FONT_PATH); pdf.set_font('NanumGothic', '', 12)
-        
-        # 1. Problem Section
+        if os.path.exists(FONT_PATH):
+            pdf.add_font('NanumGothic', '', FONT_PATH)
+            pdf.set_font('NanumGothic', '', 12)
         if export_mode in ["Integrated", "Problem Only"]:
             meta = ""
-            if data.get('achievement_standard'): meta += f"[{data.get('achievement_standard')}] "
-            if data.get('concept'): meta += f"[{data.get('concept')}]"
-            
+            if data.get('achievement_standard'):
+                meta += f"[{data.get('achievement_standard')}] "
+            if data.get('concept'):
+                meta += f"[{data.get('concept')}]"
             if meta:
-                pdf.set_font_size(10); pdf.set_text_color(100, 100, 100)
-                pdf.multi_cell(0, 6, meta); pdf.ln(5); pdf.set_text_color(0, 0, 0)
-            
-            pdf.set_font_size(14); pdf.cell(0, 10, title, ln=True); pdf.ln(5)
-            
+                pdf.set_font_size(10)
+                pdf.set_text_color(100, 100, 100)
+                pdf.multi_cell(0, 6, meta)
+                pdf.ln(5)
+                pdf.set_text_color(0, 0, 0)
+            pdf.set_font_size(14)
+            pdf.cell(0, 10, title, ln=True)
+            pdf.ln(5)
             prob_txt = data.get('problem', '').replace('\n', '\n\n')
             prob_img = PDFGenerator.render_text_to_image(prob_txt)
-            if prob_img: PDFGenerator._add_image_to_pdf(pdf, prob_img, w=180); pdf.ln(5)
-            else: pdf.multi_cell(0, 8, prob_txt.replace('$', ''))
-
+            if prob_img:
+                PDFGenerator._add_image_to_pdf(pdf, prob_img, w=180)
+                pdf.ln(5)
+            else:
+                pdf.multi_cell(0, 8, prob_txt.replace('$', ''))
             if figure_image:
-                PDFGenerator._add_image_to_pdf(pdf, figure_image, x=55, w=100); pdf.ln(5)
-        
-        # 2. Solution Section
+                PDFGenerator._add_image_to_pdf(pdf, figure_image, x=55, w=100)
+                pdf.ln(5)
         if export_mode in ["Integrated", "Solution Only"]:
-            if export_mode == "Integrated": pdf.add_page()
-            
-            pdf.set_font_size(14); pdf.cell(0, 10, "Answer & Solution", ln=True, align='C'); pdf.ln(10)
-            
+            if export_mode == "Integrated":
+                pdf.add_page()
+            pdf.set_font_size(14)
+            pdf.cell(0, 10, "Answer & Solution", ln=True, align='C')
+            pdf.ln(10)
             ans_img = PDFGenerator.render_text_to_image(f"[Answer]\n{data.get('answer', '')}")
-            if ans_img: PDFGenerator._add_image_to_pdf(pdf, ans_img, w=180); pdf.ln(5)
-            
+            if ans_img:
+                PDFGenerator._add_image_to_pdf(pdf, ans_img, w=180)
+                pdf.ln(5)
             if data.get('hint'):
                 hint_img = PDFGenerator.render_text_to_image(f"[Hint]\n{data.get('hint', '')}")
-                if hint_img: PDFGenerator._add_image_to_pdf(pdf, hint_img, w=180); pdf.ln(5)
-
+                if hint_img:
+                    PDFGenerator._add_image_to_pdf(pdf, hint_img, w=180)
+                    pdf.ln(5)
             sol_txt = f"[Solution]\n{data.get('solution', '')}".replace('\n', '\n\n')
             chunk_img = PDFGenerator.render_text_to_image(sol_txt)
             if chunk_img:
-                 PDFGenerator._add_image_to_pdf(pdf, chunk_img, w=180)
+                PDFGenerator._add_image_to_pdf(pdf, chunk_img, w=180)
             else:
-                 pdf.multi_cell(0, 8, sol_txt.replace('$', ''))
-                
+                pdf.multi_cell(0, 8, sol_txt.replace('$', ''))
         out = pdf.output(dest='S')
         if isinstance(out, str):
             return out.encode('latin-1')
         return bytes(out)
-    
+
     @staticmethod
     def create_workbook_pdf(history_items, title="My Math Workbook", export_mode="Integrated"):
         pdf = PDFGenerator.ExamPDF()
-        if os.path.exists(FONT_PATH): pdf.add_font('NanumGothic', '', FONT_PATH); pdf.set_font('NanumGothic', '', 12)
-        import tempfile
-
-        # 1. Cover
+        if os.path.exists(FONT_PATH):
+            pdf.add_font('NanumGothic', '', FONT_PATH)
+            pdf.set_font('NanumGothic', '', 12)
         pdf.add_page()
-        pdf.set_font_size(24); pdf.cell(0, 60, "", ln=True)
+        pdf.set_font_size(24)
+        pdf.cell(0, 60, "", ln=True)
         pdf.cell(0, 20, title, ln=True, align='C')
         pdf.set_font_size(16)
         pdf.cell(0, 15, f"Date: {datetime.now().strftime('%Y-%m-%d')}", ln=True, align='C')
         pdf.cell(0, 15, f"Total: {len(history_items)} Questions", ln=True, align='C')
         pdf.cell(0, 10, f"Mode: {export_mode}", ln=True, align='C')
-        
-        # 2. Problems
         if export_mode in ["Integrated", "Problem Only"]:
             pdf.add_page()
-            pdf.set_font_size(18); pdf.cell(0, 15, "PART 1. Problems", ln=True, align='C'); pdf.ln(10)
+            pdf.set_font_size(18)
+            pdf.cell(0, 15, "PART 1. Problems", ln=True, align='C')
+            pdf.ln(10)
             for idx, item in enumerate(history_items):
                 data = item['data']
-                pdf.set_font_size(10); pdf.set_text_color(100)
+                pdf.set_font_size(10)
+                pdf.set_text_color(100)
                 grade_info = item.get('grade', '')
                 diff_info = item.get('difficulty', '')
                 meta = f"Q{idx+1}. {grade_info} ({diff_info}) "
-                if data.get('achievement_standard'): meta += f"[{data.get('achievement_standard')}]"
-                elif data.get('concept'): meta += f"[{data.get('concept')}]"
-                pdf.multi_cell(0, 6, meta); pdf.set_text_color(0)
-                
+                if data.get('achievement_standard'):
+                    meta += f"[{data.get('achievement_standard')}]"
+                elif data.get('concept'):
+                    meta += f"[{data.get('concept')}]"
+                pdf.multi_cell(0, 6, meta)
+                pdf.set_text_color(0)
                 prob_txt = data.get('problem', '').replace('\n', '\n\n')
                 prob_img = PDFGenerator.render_text_to_image(prob_txt)
-                if prob_img: PDFGenerator._add_image_to_pdf(pdf, prob_img, w=175); pdf.ln(5)
-                else: pdf.set_font_size(12); pdf.multi_cell(0, 8, prob_txt.replace('$', ''))
-                
+                if prob_img:
+                    PDFGenerator._add_image_to_pdf(pdf, prob_img, w=175)
+                    pdf.ln(5)
+                else:
+                    pdf.set_font_size(12)
+                    pdf.multi_cell(0, 8, prob_txt.replace('$', ''))
                 d_code = data.get('drawing_code', '')
                 if d_code:
                     fig_data = PDFGenerator._generate_figure_from_code(d_code)
                     if fig_data:
                         PDFGenerator._add_image_to_pdf(pdf, fig_data, x=55, w=100)
                         pdf.ln(5)
-                pdf.ln(15) 
-
-        # 3. Solutions
+                pdf.ln(15)
         if export_mode in ["Integrated", "Solution Only"]:
             pdf.add_page()
-            pdf.set_font_size(18); pdf.cell(0, 15, "PART 2. Solutions", ln=True, align='C'); pdf.ln(10)
+            pdf.set_font_size(18)
+            pdf.cell(0, 15, "PART 2. Solutions", ln=True, align='C')
+            pdf.ln(10)
             for idx, item in enumerate(history_items):
                 data = item['data']
-                pdf.set_font_size(12); pdf.set_text_color(0, 0, 0)
+                pdf.set_font_size(12)
+                pdf.set_text_color(0, 0, 0)
                 pdf.cell(0, 10, f"Q{idx+1} Solution", ln=True)
-                
                 sol_txt = f"[Answer] {data.get('answer', '')}\n\n[Solution]\n{data.get('solution', '')}".replace('\n', '\n\n')
                 chunk_img = PDFGenerator.render_text_to_image(sol_txt)
-                if chunk_img: PDFGenerator._add_image_to_pdf(pdf, chunk_img, w=175); pdf.ln(10)
-                else: pdf.multi_cell(0, 8, chunk.replace('$', '')); pdf.ln(10)
-
-        # 4. Quick Answers
+                if chunk_img:
+                    PDFGenerator._add_image_to_pdf(pdf, chunk_img, w=175)
+                    pdf.ln(10)
+                else:
+                    pdf.multi_cell(0, 8, sol_txt.replace('$', ''))
+                    pdf.ln(10)
         if export_mode == "Integrated":
             pdf.add_page()
-            pdf.set_font_size(18); pdf.cell(0, 15, "PART 3. Quick Answers", ln=True, align='C'); pdf.ln(10)
+            pdf.set_font_size(18)
+            pdf.cell(0, 15, "PART 3. Quick Answers", ln=True, align='C')
+            pdf.ln(10)
             pdf.set_font_size(11)
             col_width = 190 / 2
             for i in range(0, len(history_items), 2):
@@ -823,7 +753,6 @@ class PDFGenerator:
                 y_start = pdf.get_y()
                 pdf.cell(col_width, 10, text1, border=1)
                 pdf.cell(col_width, 10, text2, border=1, ln=True)
-        
         return pdf.output(dest='S').encode('latin-1')
 
     @staticmethod
@@ -832,19 +761,17 @@ class PDFGenerator:
         with zipfile.ZipFile(zip_buffer, "a", zipfile.ZIP_DEFLATED, False) as zip_file:
             for idx, item in enumerate(history_items):
                 data = item.get('data')
-                if not data: continue
+                if not data:
+                    continue
                 title = f"Problem_{idx+1}_{item.get('grade', '').replace(' ', '_')}"
-                
                 fig_img = None
                 if data.get('drawing_code'):
                     fig_img = PDFGenerator._generate_figure_from_code(data['drawing_code'])
-                
                 try:
                     pdf_bytes = PDFGenerator.create_single_pdf(data, title, fig_img, "Integrated")
                     zip_file.writestr(f"{title}.pdf", pdf_bytes)
                 except Exception as e:
                     print(f"Error zipping item {idx}: {e}")
-                    
         return zip_buffer.getvalue()
 
     @staticmethod
@@ -861,15 +788,13 @@ class PDFGenerator:
         return output.getvalue().encode('utf-8-sig')
 
 # =========================================================================
-# 5. API Client & Logic (원본 기능 100% 복구)
+# 5. API Client & Logic
 # =========================================================================
-
 class GeminiClient:
     @staticmethod
     def get_working_model(api_key):
         key = str(api_key).strip()
         url = f"https://generativelanguage.googleapis.com/v1beta/models?key={key}"
-        # Updated priorities: gemini-2.5-flash first as requested
         priorities = ['gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
         session = requests.Session()
         adapter = HTTPAdapter(max_retries=Retry(connect=3, backoff_factor=0.5))
@@ -878,10 +803,11 @@ class GeminiClient:
             res = session.get(url, timeout=5, verify=False)
             if res.status_code == 200:
                 avail = [m['name'].replace('models/', '') for m in res.json().get('models', []) if 'generateContent' in m.get('supportedGenerationMethods', [])]
-                avail = [m for m in avail if 'gemma' not in m.lower()] 
+                avail = [m for m in avail if 'gemma' not in m.lower()]
                 return [m for m in priorities if m in avail] + [m for m in avail if m not in priorities]
-        except: pass
-        return priorities 
+        except:
+            pass
+        return priorities
 
     @staticmethod
     def test_api_connection(api_key):
@@ -893,53 +819,59 @@ class GeminiClient:
                 if res.status_code == 200:
                     st.session_state['valid_model_name'] = m
                     return True, f"Connection Successful! ({m})"
-            except: pass
+            except:
+                pass
         return False, "No usable model found."
 
     @staticmethod
     def call_api(api_key, payload, active_model_name=None, retry=0):
         pref_mode = st.session_state.get('preferred_model_mode', 'Auto')
-        if pref_mode != 'Auto': m = pref_mode
+        if pref_mode != 'Auto':
+            m = pref_mode
         else:
             m = active_model_name
             if not m:
                 cached_m = st.session_state.get('valid_model_name')
                 m = cached_m if cached_m else 'gemini-2.5-flash'
                 st.session_state['valid_model_name'] = m
-        
         url = f"https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent?key={api_key}"
         session = requests.Session()
-        session.mount("https://", HTTPAdapter(max_retries=Retry(total=3, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])))
+        session.mount("https://", HTTPAdapter(max_retries=Retry(total=5, backoff_factor=1, status_forcelist=[429, 500, 502, 503, 504])))
         try:
-            res = session.post(url, headers={'Content-Type': 'application/json'}, json=payload, timeout=300, verify=False)
+            res = session.post(url, headers={'Content-Type': 'application/json'}, json=payload, timeout=600, verify=False)
             if res.status_code == 200:
-                try: return res.json()['candidates'][0]['content']['parts'][0]['text'], m
-                except: return "⚠️ Format Error", m
+                try:
+                    return res.json()['candidates'][0]['content']['parts'][0]['text'], m
+                except:
+                    return "⚠️ Format Error", m
             elif res.status_code == 429:
-                if retry < 3:
-                    time.sleep(10); return GeminiClient.call_api(api_key, payload, m, retry+1)
+                if retry < 5:
+                    time.sleep(10)
+                    return GeminiClient.call_api(api_key, payload, m, retry+1)
                 return "⚠️ Quota Exceeded", m
             elif res.status_code == 404:
-                st.session_state['valid_model_name'] = None 
-                if retry < 1: 
-                    # Try to find a valid model again
+                st.session_state['valid_model_name'] = None
+                if retry < 1:
                     GeminiClient.test_api_connection(api_key)
                     return GeminiClient.call_api(api_key, payload, None, retry+1)
                 return "⚠️ Model Not Found", m
             return f"Error {res.status_code}: {res.text}", m
         except Exception as e:
-            if retry < 2:
-                time.sleep(5); return GeminiClient.call_api(api_key, payload, active_model_name, retry+1)
+            if retry < 5:
+                time.sleep(5)
+                return GeminiClient.call_api(api_key, payload, active_model_name, retry+1)
             return f"Network Error: {str(e)}", m
 
 def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, style_img, temperature, p_type, subject=None, lang="Korean"):
-    opt_img = image.copy(); opt_img.thumbnail((800, 800))
-    if opt_img.mode != 'RGB': opt_img = opt_img.convert('RGB')
-    buf = io.BytesIO(); opt_img.save(buf, format="JPEG"); img_str = base64.b64encode(buf.getvalue()).decode("utf-8")
-    
+    opt_img = image.copy()
+    opt_img.thumbnail((800, 800))
+    if opt_img.mode != 'RGB':
+        opt_img = opt_img.convert('RGB')
+    buf = io.BytesIO()
+    opt_img.save(buf, format="JPEG")
+    img_str = base64.b64encode(buf.getvalue()).decode("utf-8")
     diff_map = {"Maintain": "유지", "Easier": "쉽게", "Harder": "어렵게"}
     diff_kr = diff_map.get(difficulty, "유지")
-    
     grade_map = {
         "Elementary 3": "초등학교 3학년", "Elementary 4": "초등학교 4학년", "Elementary 5": "초등학교 5학년", "Elementary 6": "초등학교 6학년",
         "Middle 1": "중학교 1학년", "Middle 2": "중학교 2학년", "Middle 3": "중학교 3학년",
@@ -947,44 +879,40 @@ def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, st
         "University Math": "대학수학"
     }
     grade_kr = grade_map.get(grade, "중학교 1학년")
-    
     subject_map = {
         "Number Theory": "정수론", "Linear Algebra": "선형대수학", "Statistics": "통계학",
         "Differential Geometry": "미분기하학", "Analysis": "해석학", "Abstract Algebra": "현대대수학",
         "Complex Analysis": "복소해석학", "Topology": "위상수학", "Discrete Mathematics": "이산수학"
     }
-    
     subject_prompt = ""
     abstract_subjects = ["Abstract Algebra", "Topology", "Number Theory", "Discrete Mathematics"]
     drawing_constraint = "6. **그림 생성:** 기하학/함수 그래프 등 시각자료가 문제 풀이에 필수적인 경우에만 Python matplotlib 코드를 생성하십시오."
-    
     if grade == "University Math" and subject:
         subject_kr = subject_map.get(subject, subject)
         grade_kr = f"대학수학({subject_kr})"
         subject_prompt = f"전공 분야: {subject_kr}. 해당 전공의 전문 용어와 개념을 사용하여 문제를 출제하십시오."
-        
         if subject in abstract_subjects:
             drawing_constraint = "6. **그림 생성 금지:** 이 분야(추상수학)는 시각화가 불필요하거나 오류 가능성이 높으므로, drawing_code는 반드시 비워두십시오."
         elif subject in ["Calculus", "Differential Geometry"]:
-             drawing_constraint = "6. **그림 생성 필수 권장:** 이 분야(미적분/기하)는 시각적 이해가 중요하므로, matplotlib 코드를 적극적으로 생성하여 그래프나 도형을 제공하십시오."
-
-    if temperature < 0.3: mode_desc = "Change numbers/symbols only (Maintain Structure)"
-    elif temperature < 0.7: mode_desc = "Change context but maintain core concept"
-    else: mode_desc = "Creative application of same concept"
-
+            drawing_constraint = "6. **그림 생성 필수 권장:** 이 분야(미적분/기하)는 시각적 이해가 중요하므로, matplotlib 코드를 적극적으로 생성하여 그래프나 도형을 제공하십시오."
+    if temperature < 0.3:
+        mode_desc = "Change numbers/symbols only (Maintain Structure)"
+    elif temperature < 0.7:
+        mode_desc = "Change context but maintain core concept"
+    else:
+        mode_desc = "Creative application of same concept"
     type_inst = ""
-    if p_type == "Multiple Choice": type_inst = "Make this a multiple choice question with 5 options (①~⑤)."
-    elif p_type == "Essay": type_inst = "Make this a narrative/essay type question requiring logical explanation."
-
-    # Language instruction
+    if p_type == "Multiple Choice":
+        type_inst = "Make this a multiple choice question with 5 options (①~⑤)."
+    elif p_type == "Essay":
+        type_inst = "Make this a narrative/essay type question requiring logical explanation."
     if lang == "English":
         lang_line = "1. **Language:** Provide the Problem, Solution, and Explanation in **English**."
     else:
         lang_line = "1. **언어:** 문제, 풀이, 해설 등 모든 텍스트는 **반드시 한국어(Korean)**로 작성하십시오."
-
     parts = [{"text": f"""
     당신은 대한민국 수학 교육 전문가입니다. 입력된 이미지의 문제를 분석하여, 동일한 수학적 개념을 묻는 '{grade_kr}' 수준(난이도:{diff_kr})의 새로운 '쌍둥이 문제'를 만드십시오.
-    
+
     [필수 지침]
     {lang_line}
     2. **용어 제한(중요):** 대한민국 초/중/고등학교 교육과정 내의 표준 용어만 사용하십시오.
@@ -1000,12 +928,13 @@ def generate_draft(api_key, image, difficulty, grade, curr_text, instruction, st
     7. **절대 금지:** 생성된 그림에 정답, 해설, 힌트 텍스트를 넣지 마십시오. 오직 문제의 초기 상태만 시각화하십시오.
     8. **코드 규칙:** Python 코드 작성 시 줄바꿈 문자(\\)를 절대 사용하지 마십시오.
     """}, {"inline_data": {"mime_type": "image/jpeg", "data": img_str}}]
-    
     if style_img:
-        s_buf = io.BytesIO(); style_img.save(s_buf, format="JPEG"); s_str = base64.b64encode(s_buf.getvalue()).decode("utf-8")
-        parts.append({"text": "Style Reference:"}); parts.append({"inline_data": {"mime_type": "image/jpeg", "data": s_str}})
-
-    payload = {"contents": [{"parts": parts}], "safetySettings": [{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}], "generationConfig": {"temperature": 0.1, "response_mime_type": "application/json"}}
+        s_buf = io.BytesIO()
+        style_img.save(s_buf, format="JPEG")
+        s_str = base64.b64encode(s_buf.getvalue()).decode("utf-8")
+        parts.append({"text": "Style Reference:"})
+        parts.append({"inline_data": {"mime_type": "image/jpeg", "data": s_str}})
+    payload = {"contents": [{"parts": parts}], "safetySettings": [{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}], "generationConfig": {"temperature": max(0.8, temperature), "response_mime_type": "application/json"}}
     return GeminiClient.call_api(api_key, payload)
 
 def refine_final(api_key, draft, style_img, grade, subject=None, lang="Korean"):
@@ -1016,7 +945,6 @@ def refine_final(api_key, draft, style_img, grade, subject=None, lang="Korean"):
         "University Math": "대학수학"
     }
     grade_kr = grade_map.get(grade, "중학교 1학년")
-    
     subject_map = {
         "Number Theory": "정수론", "Linear Algebra": "선형대수학", "Statistics": "통계학",
         "Differential Geometry": "미분기하학", "Analysis": "해석학", "Abstract Algebra": "현대대수학",
@@ -1039,16 +967,13 @@ def refine_final(api_key, draft, style_img, grade, subject=None, lang="Korean"):
         - 문제 조건이 불충분하거나 모순이 있는지 확인하십시오.
         - 계산 과정에 오류가 있다면 수정하십시오.
         """
-
-    # Language instruction
     if lang == "English":
         lang_line = "1. **Language:** The final problem, solution, and answer must be in **English**."
     else:
         lang_line = "1. **언어:** 모든 내용은 **한국어(Korean)**로 작성되어야 합니다."
-
     prompt = f"""
     당신은 대한민국 수학 문제 검토 위원장입니다. 아래 초안(Draft)을 면밀히 검토하고, 오류가 있다면 수정한 뒤 최종본을 JSON 포맷으로 작성하십시오.
-    
+
     [검토 및 수정 지침]
     {lang_line}
     2. **풀이 검증:** 논리적 비약이나 계산 오류가 없어야 합니다. 풀이는 '1단계', '2단계' 또는 'Step 1', 'Step 2'와 같이 단계별로 명확히 서술하십시오.
@@ -1058,77 +983,59 @@ def refine_final(api_key, draft, style_img, grade, subject=None, lang="Korean"):
     6. **그림 코드:** matplotlib 사용 시 plt.show()를 포함하지 마십시오. 코드 줄바꿈에 백슬래시(\\)를 사용하지 마십시오.
     7. **그림 검증:** 그림에 정답이나 풀이 과정이 포함되어 있다면 제거하고, 문제의 초기 상태만 그리도록 코드를 수정하십시오.
     8. **성취기준:** 해당 문제가 속한 대한민국 교육과정 성취기준 코드(예: [10수학01-01])를 분석하여 작성하십시오. (대학수학은 관련 전공 주제 명시)
-    
+
     {validation_prompt}
-    
+
     [입력된 초안]
     {draft}
-    
+
     [최종 출력 JSON 포맷]
     {{ "concept": "핵심 개념", "problem": "수정된 문제 내용", "hint": "힌트", "answer": "검증된 정답", "solution": "검증된 상세 풀이 (줄바꿈 필수)", "drawing_code": "Python 코드", "achievement_standard": "성취기준" }}
     """
     parts = [{"text": prompt}]
     if style_img:
-        s_buf = io.BytesIO(); style_img.save(s_buf, format="JPEG"); s_str = base64.b64encode(s_buf.getvalue()).decode("utf-8")
+        s_buf = io.BytesIO()
+        style_img.save(s_buf, format="JPEG")
+        s_str = base64.b64encode(s_buf.getvalue()).decode("utf-8")
         parts.append({"inline_data": {"mime_type": "image/jpeg", "data": s_str}})
-
-    payload = {"contents": [{"parts": parts}], "safetySettings": [{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}], "generationConfig": {"temperature": 0.1, "response_mime_type": "application/json"}}
+    payload = {"contents": [{"parts": parts}], "safetySettings": [{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_NONE"}], "generationConfig": {"temperature": 0.8, "response_mime_type": "application/json"}}
     return GeminiClient.call_api(api_key, payload)
 
 # =========================================================================
-# 6. UI Dialogs (필요한 기능만 유지)
+# 6. UI Dialogs
 # =========================================================================
-
 @st.dialog("📝 Options")
 def dialog_options():
-    # Use T() for title? The decorator title is set at definition time.
-    # To support dynamic title, we need to pass the title to the function and use st.markdown or header inside,
-    # OR define the dialog function inside the main loop (which is less efficient).
-    # Since st.dialog is a decorator, let's keep the title static or update it via a rerun if possible.
-    # For now, we update the content.
     st.caption(T("opt_caption"))
-    
-    # Grade Selection
     current_grade = st.session_state['grade']
-    # Use index to set default
     grade_options = ["Middle 1", "Middle 2", "Middle 3", "High 1", "High 2", "High 3", "University Math"]
     try:
         idx = grade_options.index(current_grade)
     except:
         idx = 0
-    
-    # Use format_func to display translated labels
     g = st.selectbox(T("opt_grade"), grade_options, index=idx, format_func=get_option_label, key="opt_grade")
-    
-    if g != st.session_state['grade']: 
+    if g != st.session_state['grade']:
         st.session_state['grade'] = g
-        # st.rerun() removed to prevent closing dialog prematurely
-
     if st.session_state['grade'] == "University Math":
         s = st.selectbox(T("opt_subject"), ["Calculus", "Linear Algebra", "Statistics", "Topology", "Number Theory"], format_func=get_option_label, key="opt_subj")
         st.session_state['subject'] = s
-    
-    # Difficulty
     diff_opts = ["Maintain", "Easier", "Harder"]
     try:
         d_idx = diff_opts.index(st.session_state['difficulty'])
     except:
         d_idx = 0
     st.session_state['difficulty'] = st.radio(T("opt_diff"), diff_opts, index=d_idx, format_func=get_option_label, key="opt_diff")
-    
-    # Type
     type_opts = ["Any", "Multiple Choice", "Essay"]
     try:
         t_idx = type_opts.index(st.session_state['prob_type'])
     except:
         t_idx = 0
     st.session_state['prob_type'] = st.radio(T("opt_type"), type_opts, index=t_idx, format_func=get_option_label, key="opt_type")
-
     st.divider()
-    if st.button(T("opt_save"), type="primary", use_container_width=True): 
+    if st.button(T("opt_save"), type="primary", use_container_width=True):
         st.rerun()
 
-@st.dialog("📖 Guide") # Title remains static or needs a workaround for dynamic update
+@st.dialog("📖 Guide")
 def dialog_guide():
     st.markdown(T("guide_md"))
 
@@ -1142,7 +1049,8 @@ def dialog_materials():
     if uploaded_refs:
         for u_file in uploaded_refs:
             txt, err = extract_text_safe(u_file)
-            if not err: st.session_state['curriculum_text'] += "\n" + txt
+            if not err:
+                st.session_state['curriculum_text'] += "\n" + txt
         st.success(T("mat_success"))
 
 @st.dialog("🖼️ Style")
@@ -1150,11 +1058,12 @@ def dialog_style():
     st.caption(T("style_caption"))
     s_file = st.file_uploader(T("style_label"), type=['png', 'jpg'], key="style_upload")
     if s_file:
-        try: 
+        try:
             st.session_state['style_img'] = pdf_to_image(s_file) if s_file.type == "application/pdf" else Image.open(s_file)
             st.success(T("style_success"))
             st.image(st.session_state['style_img'], caption=T("style_current"), use_container_width=True)
-        except: st.error(T("style_fail"))
+        except:
+            st.error("스타일 적용 실패")
 
 @st.dialog("🎨 Theme")
 def dialog_theme():
@@ -1164,7 +1073,8 @@ def dialog_theme():
     b = c2.color_picker(T("theme_bg"), st.session_state['theme_bg'], key="cp_b")
     t = c3.color_picker(T("theme_text"), st.session_state['theme_text'], key="cp_t")
     bg_img = st.file_uploader(T("theme_bg_img"), type=['png', 'jpg', 'jpeg'], key="bg_upload")
-    if bg_img: st.session_state['bg_image_file'] = bg_img
+    if bg_img:
+        st.session_state['bg_image_file'] = bg_img
     if st.button(T("theme_apply"), key="btn_apply_theme"):
         st.session_state['theme_primary'] = p
         st.session_state['theme_bg'] = b
@@ -1181,14 +1091,11 @@ def dialog_data():
 # =========================================================================
 # 7. Main Application Logic
 # =========================================================================
-
 def apply_custom_css():
-    """사용자 설정 테마 및 배경 이미지 적용 (원본 그대로)"""
     primary = st.session_state.get('theme_primary', "#e4c1b2")
     bg = st.session_state.get('theme_bg', "#242329")
     text_color = st.session_state.get('theme_text', "#ded5d2")
     sidebar_bg = "#1A1C24"
-
     bg_style = f"background-color: {bg};"
     if st.session_state.get('bg_image_file'):
         try:
@@ -1202,11 +1109,9 @@ def apply_custom_css():
             """
         except:
             bg_style = f"background-color: {bg};"
-
     st.markdown(f"""
         <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css');
-
         .stApp {{
             {bg_style}
             color: {text_color};
@@ -1217,7 +1122,6 @@ def apply_custom_css():
             background: rgba(18, 18, 18, 0.4);
             pointer-events: none; z-index: -1;
         }}
-        /* Header Banner */
         .logo-container {{
             display: flex; align-items: center; justify-content: center;
             padding: 30px 0; margin-bottom: 30px;
@@ -1236,15 +1140,11 @@ def apply_custom_css():
             text-shadow: 0 0 30px {primary}33;
         }}
         @keyframes float {{ 0%, 100% {{ transform: translateY(0); }} 50% {{ transform: translateY(-6px); }} }}
-
-        /* Sidebar Styling */
         [data-testid="stSidebar"] {{
             background-color: {sidebar_bg};
             border-right: 1px solid #403e41;
             padding-top: 10px;
         }}
-        
-        /* Result Card */
         .result-card {{
             background-color: #2F2E35;
             border: 1px solid #403e41;
@@ -1261,8 +1161,6 @@ def apply_custom_css():
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 10px;
         }}
-
-        /* Sidebar Buttons */
         [data-testid="stSidebar"] div.stButton > button {{
             background-color: transparent;
             color: {primary};
@@ -1274,30 +1172,24 @@ def apply_custom_css():
         }}
         [data-testid="stSidebar"] div.stButton > button:hover {{
             background-color: {primary};
-            color: #242329; /* Dark text on bright hover */
+            color: #242329;
             box-shadow: 0 0 10px {primary}44;
             transform: translateY(-1px);
         }}
-
-        /* Sidebar Text Fixes */
         [data-testid="stSidebar"] label {{
             color: {primary} !important;
         }}
         [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3 {{
             color: {primary} !important;
         }}
-        
-        /* Custom Colors for Specific Texts */
         [data-testid="stSidebar"] p {{
             color: {primary} !important;
         }}
         [data-testid="stMarkdownContainer"] p {{
             color: {primary} !important;
         }}
-
-        /* Dashboard (Status Box) Visibility Fix */
         .status-box {{
-            background-color: rgba(255,255,255,0.08); /* Lighter background */
+            background-color: rgba(255,255,255,0.08);
             border-left: 3px solid {primary};
             border-radius: 8px;
             padding: 15px;
@@ -1306,18 +1198,16 @@ def apply_custom_css():
             box-shadow: inset 0 0 20px rgba(0,0,0,0.2);
         }}
         .status-item {{
-            display: flex; justify-content: space-between; 
+            display: flex; justify-content: space-between;
             margin-bottom: 8px;
             border-bottom: 1px dashed rgba(255,255,255,0.1);
             padding-bottom: 4px;
         }}
         .status-item:last-child {{ border-bottom: none; }}
-        .status-label {{ color: #e0e0e0; }} /* Brighter text for visibility */
+        .status-label {{ color: #e0e0e0; }}
         .status-value {{ color: {primary}; font-weight: bold; letter-spacing: 0.5px; }}
-
-        /* File Uploader Button Styling */
         [data-testid="stFileUploader"] button {{
-            background-color: #2F2E35 !important; /* Darker background */
+            background-color: #2F2E35 !important;
             color: {primary} !important;
             border: 1px solid {primary} !important;
             border-radius: 8px !important;
@@ -1334,19 +1224,16 @@ def apply_custom_css():
         [data-testid="stFileUploader"] div[data-testid="stMarkdownContainer"] p {{
             color: {primary} !important;
         }}
-        /* Drag and Drop Text Styling */
         [data-testid="stFileUploader"] .st-emotion-cache-1fttcpj {{
             color: {primary} !important;
         }}
-        /* Upload Icon Color */
         [data-testid="stFileUploader"] svg {{
             fill: {primary} !important;
             color: {primary} !important;
         }}
-        /* Answer & Solution Border Fix */
         [data-testid="stVerticalBlockBorderWrapper"] {{
-             border-color: {primary} !important;
-             border-width: 2px !important;
+            border-color: {primary} !important;
+            border-width: 2px !important;
         }}
         </style>
     """, unsafe_allow_html=True)
@@ -1358,38 +1245,37 @@ def main_app_interface():
             <div class="logo-text">Math Twin Generator</div>
         </div>
     """, unsafe_allow_html=True)
-
-    # API Key Handling (Secrets -> Input)
     api_key = st.session_state.get('api_key')
     if "GEMINI_API_KEY" in st.secrets:
         api_key = st.secrets["GEMINI_API_KEY"]
-    
     with st.sidebar:
-        # Language Selector
         lang_code = st.radio("Language / 언어", ["Korean", "English"], horizontal=True, label_visibility="collapsed")
         st.session_state['language'] = lang_code
-
-        if st.button(T("guide_btn"), use_container_width=True): dialog_guide()
-        
-        # API Key Input if not in Secrets
+        if st.button(T("guide_btn"), use_container_width=True):
+            dialog_guide()
         if not api_key:
             new_key = st.text_input(T("api_input_label"), type="password")
-            if new_key: st.session_state['api_key'] = new_key; api_key = new_key
+            if new_key:
+                st.session_state['api_key'] = new_key
+                api_key = new_key
             if st.button(T("api_check_btn")):
-                 ok, msg = GeminiClient.test_api_connection(api_key)
-                 if ok: st.success(T("api_success"))
-                 else: st.error(msg)
-        
-        # Check API connection automatically if key exists but model not set
+                ok, msg = GeminiClient.test_api_connection(api_key)
+                if ok:
+                    st.success(T("api_success"))
+                else:
+                    st.error(msg)
         if api_key and not st.session_state.get('valid_model_name'):
-             ok, msg = GeminiClient.test_api_connection(api_key)
-
-        if st.button(T("options_btn"), use_container_width=True): dialog_options()
-        if st.button(T("materials_btn"), use_container_width=True): dialog_materials()
-        if st.button(T("style_btn"), use_container_width=True): dialog_style()
-        if st.button(T("theme_btn"), use_container_width=True): dialog_theme()
-        if st.button(T("data_btn"), use_container_width=True): dialog_data()
-        
+            ok, msg = GeminiClient.test_api_connection(api_key)
+        if st.button(T("options_btn"), use_container_width=True):
+            dialog_options()
+        if st.button(T("materials_btn"), use_container_width=True):
+            dialog_materials()
+        if st.button(T("style_btn"), use_container_width=True):
+            dialog_style()
+        if st.button(T("theme_btn"), use_container_width=True):
+            dialog_theme()
+        if st.button(T("data_btn"), use_container_width=True):
+            dialog_data()
         st.divider()
         st.markdown(f"""
         <div class="status-box">
@@ -1399,13 +1285,9 @@ def main_app_interface():
             {f'<div class="status-item"><span class="status-label">Subject</span><span class="status-value">{st.session_state.get("subject")}</span></div>' if st.session_state.get('grade') == 'University Math' else ''}
         </div>
         """, unsafe_allow_html=True)
-        
-        # [광고 영역]
         display_sidebar_ads()
-
     c1, c2 = st.columns([1, 1.2])
     with c1:
-        # [Design Fix] Removed custom header HTML for 'Original' and used st.tabs instead to match right column
         tab_original_list = st.tabs([T("original_card")])
         with tab_original_list[0]:
             with st.container(border=True):
@@ -1413,25 +1295,19 @@ def main_app_interface():
                 if q_file:
                     img = pdf_to_image(q_file) if q_file.type == 'application/pdf' else Image.open(q_file)
                     st.image(img, use_container_width=True)
-                    
                     if st.button(T("generate_btn"), type="primary", disabled=not api_key, use_container_width=True):
                         with st.status(T("generating_status")):
                             d_res, _ = generate_draft(api_key, img, st.session_state['difficulty'], st.session_state['grade'], st.session_state['curriculum_text'], "", st.session_state['style_img'], st.session_state['creativity'], st.session_state['prob_type'], st.session_state['subject'], st.session_state['language'])
                             f_res, _ = refine_final(api_key, d_res, st.session_state['style_img'], st.session_state['grade'], st.session_state['subject'], st.session_state['language'])
-                        
                             st.session_state['generated_data'] = parse_gemini_json_response(f_res)
-                            
-                            # Save to History
                             if st.session_state['generated_data'].get('problem'):
-                                 history_item = {"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "data": st.session_state['generated_data'], "grade": st.session_state['grade'], "difficulty": st.session_state['difficulty']}
-                                 st.session_state['history'].insert(0, history_item)
-                                 
+                                history_item = {"time": datetime.now().strftime("%Y-%m-%d %H:%M"), "data": st.session_state['generated_data'], "grade": st.session_state['grade'], "difficulty": st.session_state['difficulty']}
+                                st.session_state['history'].insert(0, history_item)
                             st.rerun()
-                    if not api_key: st.error(T("api_error"))
-
+                    if not api_key:
+                        st.error(T("api_error"))
     with c2:
         tab_curr, tab_hist = st.tabs([T("result_tab"), T("history_tab")])
-        
         with tab_curr:
             if st.session_state.get('generated_data'):
                 data = st.session_state.get('generated_data')
@@ -1440,57 +1316,46 @@ def main_app_interface():
                     with st.container(border=True):
                         st.markdown(f"**Q.** {normalize_latex_text(data.get('problem'))}")
                     st.markdown('</div>', unsafe_allow_html=True)
-                
                 d_code = data.get('drawing_code')
                 if d_code and "plt" in d_code:
                     try:
                         code = clean_python_code(d_code)
-                        plt.clf(); plt.close('all'); fig = plt.figure()
+                        plt.clf()
+                        plt.close('all')
+                        fig = plt.figure()
                         exec(code, {'plt': plt, 'np': np})
-                        # Check if anything was actually plotted
-                        if len(fig.get_axes()) > 0: 
+                        if len(fig.get_axes()) > 0:
                             st.pyplot(fig)
                             st.session_state['generated_figure'] = fig
                         else:
                             st.session_state['generated_figure'] = None
-                    except: pass
-                
-                # Answer & Solution wrapped in bordered container
+                    except:
+                        pass
                 with st.container(border=True):
                     with st.expander(T("answer_solution")):
                         st.markdown(f"**Ans:** {data.get('answer')}")
                         st.divider()
                         sol = str(data.get('solution')).replace('\\n', '\n').replace('\n', '\n\n')
                         st.markdown(f"**Solution:**\n\n{normalize_latex_text(sol)}")
-                
                 st.divider()
-                
                 c_tit, c_mode = st.columns([2, 1])
                 title = c_tit.text_input("File Name", value=f"{st.session_state['grade']} Math Twin Problem")
                 export_mode = c_mode.selectbox("Export Mode", [T("export_mode_integrated"), T("export_mode_problem"), T("export_mode_solution")], label_visibility="collapsed")
-                
-                # Map translated options back to internal keys
                 mode_map = {
                     T("export_mode_integrated"): "Integrated",
                     T("export_mode_problem"): "Problem Only",
                     T("export_mode_solution"): "Solution Only"
                 }
                 internal_mode = mode_map.get(export_mode, "Integrated")
-
-                # Figure handling for PDF
                 fig_img = None
                 if st.session_state.get('generated_figure'):
-                     buf = io.BytesIO()
-                     st.session_state['generated_figure'].savefig(buf, format='png', bbox_inches='tight')
-                     buf.seek(0)
-                     fig_img = Image.open(buf)
-
+                    buf = io.BytesIO()
+                    st.session_state['generated_figure'].savefig(buf, format='png', bbox_inches='tight')
+                    buf.seek(0)
+                    fig_img = Image.open(buf)
                 pdf_bytes = PDFGenerator.create_single_pdf(data, title, fig_img, internal_mode)
-                
                 if pdf_bytes:
-                     st.download_button(T("download_pdf"), data=bytes(pdf_bytes), file_name=f"{title}.pdf", mime="application/pdf", use_container_width=True)
-                
-                # [결과 하단 광고]
+                    st.download_button(T("download_pdf"), data=bytes(pdf_bytes), file_name=f"{title}.pdf", mime="application/pdf", use_container_width=True)
                 st.success("팁: 이 문제가 마음에 드셨나요? 더 많은 자료는 아래 링크를 확인해보세요!")
                 st.markdown("""
                 <a href="https://www.yes24.com" target="_blank">
@@ -1501,8 +1366,23 @@ def main_app_interface():
                 """, unsafe_allow_html=True)
             else:
                 st.info("Upload and generate to see results.")
-    
-    # [NEW] Call bottom ad
+        with tab_hist:
+            st.subheader(T("recent_history"))
+            if not st.session_state['history']:
+                st.info(T("no_history"))
+            else:
+                for i, item in enumerate(st.session_state['history']):
+                    with st.expander(f"{item['time']} - {item['grade']} ({item['difficulty']})"):
+                        data = item['data']
+                        st.markdown(f"**Concept:** {data.get('concept')}")
+                        st.markdown(f"**Problem:** {normalize_latex_text(data.get('problem'))}")
+                        st.markdown(f"**Answer:** {data.get('answer')}")
+                        st.markdown(f"**Solution:** {normalize_latex_text(data.get('solution'))}")
+                        if st.button(T("delete"), key=f"del_{i}"):
+                            del st.session_state['history'][i]
+                            st.rerun()
+                st.download_button(T("zip_download"), PDFGenerator.create_history_zip(st.session_state['history']), file_name="history.zip", mime="application/zip", use_container_width=True)
+                st.download_button(T("csv_download"), PDFGenerator.convert_history_to_csv(st.session_state['history']), file_name="history.csv", mime="text/csv", use_container_width=True)
     display_bottom_ad()
 
 def main():
