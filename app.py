@@ -1,4 +1,4 @@
-# -------------------------------------------------------------------------
+\# -------------------------------------------------------------------------
 # Math Twin Generator - Public Full Version (Ad-Supported)
 # -------------------------------------------------------------------------
 
@@ -76,7 +76,7 @@ def setup_fonts():
         try:
             fm.fontManager.addfont(FONT_PATH)
             # [Fix] Set font globally for Matplotlib to handle mixed content better
-            plt.rcParams['font.family'] = 'NanumGothic'
+            plt.rcParams['font.family'] = ['NanumGothic', 'DejaVu Sans']
             plt.rcParams['mathtext.fontset'] = 'cm' # Use Computer Modern for math
             plt.rcParams['axes.unicode_minus'] = False
             font_ready = True
@@ -1489,7 +1489,7 @@ def main_app_interface():
                 st.markdown("""
                 <a href="https://www.yes24.com" target="_blank">
                     <div style="background-color: #f0f2f6; padding: 15px; border-radius: 8px; text-align: center; color: #333;">
-                        📚 <b>추천 문제집 보러가기</b>
+                        📚 <b>추천 문제집 보러가기 (YES24)</b>
                     </div>
                 </a>
                 """, unsafe_allow_html=True)
