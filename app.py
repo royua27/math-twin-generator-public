@@ -219,15 +219,20 @@ def display_sidebar_ads():
     st.sidebar.markdown(tip_html, unsafe_allow_html=True)
 def display_bottom_ad():
     current_grade = st.session_state.get('grade', '')
-    search_keyword = "수학문제집"
-    if "Elementary" in current_grade or "초등" in current_grade:
-        search_keyword = "초등수학문제집"
-    elif "Middle" in current_grade or "중학" in current_grade:
-        search_keyword = "중등수학문제집"
-    elif "High" in current_grade or "고등" in current_grade:
-        search_keyword = "고등수학문제집"
-    elif "University" in current_grade:
-        search_keyword = "대학수학 전공서적"
+    grade_map = {
+        "Elementary 3": "초등 3학년 수학 문제집",
+        "Elementary 4": "초등 4학년 수학 문제집",
+        "Elementary 5": "초등 5학년 수학 문제집",
+        "Elementary 6": "초등 6학년 수학 문제집",
+        "Middle 1": "중1 수학 문제집",
+        "Middle 2": "중2 수학 문제집",
+        "Middle 3": "중3 수학 문제집",
+        "High 1": "고1 수학 문제집",
+        "High 2": "고2 수학 문제집",
+        "High 3": "고3 수학 문제집",
+        "University Math": "대학수학 문제집"
+    }
+    search_keyword = grade_map.get(current_grade, "수학 문제집")
     partners_link = f"https://www.coupang.com/np/search?component=&q={search_keyword}&channel=user"
     ad_html = f"""
     <div style="
@@ -383,7 +388,7 @@ def split_long_latex(text, limit=75):
     if not isinstance(text, str):
         text = str(text)
     def replacer(match):
-        content_content = match.group(0)
+        content = match.group(0)
         inner = content[1:-1].strip()
         if r'\begin{' in inner:
             return content
