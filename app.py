@@ -1,4 +1,4 @@
-\# -------------------------------------------------------------------------
+# -------------------------------------------------------------------------
 # Math Twin Generator - Public Full Version (Ad-Supported)
 # -------------------------------------------------------------------------
 
@@ -338,50 +338,49 @@ def display_bottom_ad():
     elif "High" in current_grade or "고등" in current_grade: search_keyword = "고등수학문제집"
     elif "University" in current_grade: search_keyword = "대학수학 전공서적"
 
-    # 파트너스 링크 (여기에 선생님의 쿠팡 파트너스 트래킹 링크를 넣으면 됩니다)
-    # 현재는 예시로 검색 결과 페이지 링크를 넣었습니다.
+    # 파트너스 링크
     partners_link = f"https://www.coupang.com/np/search?component=&q={search_keyword}&channel=user"
     
-    # Premium Style Banner - Fixed Bottom, Compact Version, No Disclaimer
+    # Premium Style Banner - Fixed Bottom, Compact Version (0.7x size), Centered
     ad_html = f"""
     <div style="
         position: fixed;
-        bottom: 20px;
+        bottom: 10px;
         left: 50%;
         transform: translateX(-50%);
         z-index: 999;
-        width: 80%;
-        max-width: 600px;
+        width: 60%; 
+        max-width: 450px;
         background: linear-gradient(135deg, #2F2E35 0%, #1A1C24 100%);
         border: 1px solid #e4c1b2;
-        border-radius: 30px;
-        padding: 10px 20px;
+        border-radius: 20px;
+        padding: 10px 15px;
         text-align: center;
         box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 5px;
+        gap: 3px;
     ">
-        <div style="color: #e4c1b2; font-size: 1.0rem; font-weight: bold;">
+        <div style="color: #e4c1b2; font-size: 0.9rem; font-weight: bold;">
             {T("bottom_ad_prefix")}{current_grade}{T("bottom_ad_suffix")}
         </div>
-        <div style="color: #e0e0e0; font-size: 0.9rem;">
+        <div style="color: #e0e0e0; font-size: 0.8rem; margin-bottom: 5px;">
             {T("bottom_ad_desc")}
         </div>
-        <a href="{partners_link}" target="_blank" style="text-decoration: none; margin-top: 5px;">
+        <a href="{partners_link}" target="_blank" style="text-decoration: none;">
             <div style="
-                background-color: #008CFA; /* Coupang Blue */
+                background-color: #008CFA; 
                 color: white;
-                padding: 8px 25px;
-                border-radius: 20px;
+                padding: 6px 20px;
+                border-radius: 15px;
                 font-weight: 800;
-                font-size: 0.9rem;
+                font-size: 0.8rem;
                 display: inline-block;
                 transition: all 0.2s ease;
-                box-shadow: 0 4px 15px rgba(0, 140, 250, 0.3);
-            " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 20px rgba(0, 140, 250, 0.5)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 15px rgba(0, 140, 250, 0.3)';">
+                box-shadow: 0 2px 10px rgba(0, 140, 250, 0.3);
+            " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 4px 15px rgba(0, 140, 250, 0.5)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 2px 10px rgba(0, 140, 250, 0.3)';">
                 {T("bottom_ad_btn")}
             </div>
         </a>
