@@ -97,7 +97,7 @@ UI_TEXT = {
         "zip_download": "📦 전체 다운로드 (ZIP)", "csv_download": "📊 CSV 저장",
         "select_all": "전체 선택", "view_details": "상세 보기", "delete": "삭제",
         "create_workbook": "📚 워크북 생성", "no_history": "기록이 없습니다.",
-        "tip_title": "📚 선생님을 위한 추천 도서",
+        "tip_title": "📚 추천 도서",
         "tip_content": "수업 퀄리티를 높여줄 필독서와 베스트셀러 문제집을 확인해보세요!<br><a href='http://www.yes24.com' target='_blank' style='color: #4CAF50; text-decoration: underline;'>베스트셀러 보러가기</a>",
         "ad_title": "🔥 선생님 필수템", "ad_content": "수학 교구 모음전", "ad_click": "(클릭하여 보기)",
         "bottom_ad_prefix": "🚀 ", "bottom_ad_suffix": " 수학 성적 수직 상승의 비밀?",
@@ -1342,6 +1342,7 @@ def main():
     main_app_interface()
 if __name__ == "__main__":
     main()
+
 
 
 
